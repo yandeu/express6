@@ -244,3 +244,10 @@ export const setCharset = (type, charset) => {
   // format type
   return contentType.format(parsed)
 }
+
+export class ExtensibleFunction<T> extends Function {
+  constructor(f: T) {
+    super()
+    return Object.setPrototypeOf(f, new.target.prototype)
+  }
+}

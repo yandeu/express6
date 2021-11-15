@@ -20,7 +20,7 @@ let express = () => {
 }
 
 express.Route = ex.Route
-express.Router = ex.Router
+express.Router = opts => new ex.Router(opts)
 express.query = ex.query
 express.application = ex.application
 express.request = ex.request

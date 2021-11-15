@@ -129,7 +129,7 @@ class Express {
   /** Getting lazily added base router. */
   public get router() {
     if (!this._router) {
-      this._router = Router({
+      this._router = new Router({
         caseSensitive: this.enabled('case sensitive routing'),
         strict: this.enabled('strict routing')
       })

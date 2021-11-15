@@ -14,47 +14,44 @@ import mixin from 'utils-merge'
 import _debug from 'debug'
 import { flatten } from 'array-flatten'
 import parseUrl from 'parseurl'
+import { RequestHandler } from '../types.js'
+import { ExtensibleFunction } from '../utils.js'
 
 const debug = _debug('express:router')
 const objectRegExp = /^\[object (\S+)\]$/
 const slice = Array.prototype.slice
 const toString = Object.prototype.toString
 
+interface RouterOptions {
+  caseSensitive?: boolean
+  mergeParams?: boolean
+  strict?: boolean
+}
+
 /**
  * Initialize a new `Router` with the given `options`.
  *
  * @param {Object} [options]
  * @return {Router} which is an callable function
- * @public
  */
-const Router = (opts: any = {}) => {
-  function router(req, res, next) {
-    // @ts-ignore
-    router.handle(req, res, next)
+class Router extends ExtensibleFunction<RequestHandler> {
+  _params: any = {}
+  params: any = {}
+  stack: any[] = []
+  mergeParams: boolean
+  caseSensitive: boolean
+  strict: boolean
+
+  constructor(options: RouterOptions = {}) {
+    super((req, res, next) => {
+      return this.handle(req, res, next)
+    })
+
+    const { caseSensitive = false, mergeParams = false, strict = false } = options
+    this.caseSensitive = caseSensitive
+    this.mergeParams = mergeParams
+    this.strict = strict
   }
-
-  // mixin Router class functions
-  Object.setPrototypeOf(router, new proto())
-
-  router.params = {}
-  router.caseSensitive = opts.caseSensitive
-  router.mergeParams = opts.mergeParams
-  router.strict = opts.strict
-  router.stack = []
-
-  return router
-}
-
-export { Router }
-export default Router
-
-export class proto {
-  _params: any
-  params: any
-  stack: any
-  mergeParams: any
-  caseSensitive: any
-  strict: any
 
   /**
    * Map the given param placeholder `name`(s) to the given callback.
@@ -72,25 +69,20 @@ export class proto {
    * Just like in middleware, you must either respond to the request or call next
    * to avoid stalling the request.
    *
-   *  app.param('user_id', function(req, res, next, id){
-   *    User.find(id, function(err, user){
-   *      if (err) {
-   *        return next(err);
-   *      } else if (!user) {
-   *        return next(new Error('failed to load user'));
-   *      }
-   *      req.user = user;
-   *      next();
-   *    });
-   *  });
-   *
-   * @param {String} name
-   * @param {Function} fn
-   * @return {app} for chaining
-   * @public
+   * @example
+   * app.param('user_id', function (req, res, next, id) {
+   *   User.find(id, function (err, user) {
+   *     if (err) {
+   *       return next(err)
+   *     } else if (!user) {
+   *       return next(new Error('failed to load user'))
+   *     }
+   *     req.user = user
+   *     next()
+   *   })
+   * })
    */
-
-  param(name, fn) {
+  public param(name: string, fn: Function): this {
     if (!fn) {
       throw new TypeError('argument fn is required')
     }
@@ -110,12 +102,8 @@ export class proto {
     return this
   }
 
-  /**
-   * Dispatch a req, res into the router.
-   * @private
-   */
-
-  handle(req, res, out) {
+  /** Dispatch a req, res into the router. */
+  private handle(req, res, out) {
     const self = this
 
     debug('dispatching %s %s', req.method, req.url)
@@ -297,12 +285,8 @@ export class proto {
     }
   }
 
-  /**
-   * Process any parameters for the layer.
-   * @private
-   */
-
-  process_params(layer, called, req, res, done) {
+  /** Process any parameters for the layer. */
+  private process_params(layer, called, req, res, done) {
     const params = this.params
 
     // captured parameters from the layer, keys and values
@@ -491,7 +475,7 @@ export class proto {
 
 // create Router#VERB functions
 methods.concat('all').forEach(function (method) {
-  proto.prototype[method] = function (path) {
+  Router.prototype[method] = function (path) {
     const route = this.route(path)
     // eslint-disable-next-line prefer-spread
     route[method].apply(route, slice.call(arguments, 1))
@@ -642,3 +626,6 @@ function wrap(old, fn) {
     fn.apply(this, args)
   }
 }
+
+export default Router
+export { Router }
