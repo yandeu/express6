@@ -3,17 +3,23 @@
  */
 
 import { get } from 'http'
-import { express } from './lib/express.js'
+import { express, RequestHandler, Router } from './lib/express.js'
+import http from 'http'
 
+const port = 3000
 const app = express()
+const server = http.createServer(app as any)
+const router = new Router()
+
+router.use((req, res, next) => {
+  console.log('Time: ', Date.now())
+  next()
+})
+
+app.use(router as unknown as RequestHandler)
 
 app.use((req, res, next) => {
   console.log('use()')
-  return next()
-})
-
-app.all('/', (req, res, next) => {
-  console.log("all '/'")
   return next()
 })
 
@@ -27,10 +33,10 @@ app.post('/', (req, res) => {
   return res.json({ success: true })
 })
 
-app.listen(3000, () => {
-  console.log('listen on port 3000')
+server.listen(port, () => {
+  console.log('listen on port', port, `(http://localhost:${port}/)`)
 
   setTimeout(async () => {
-    get('http://localhost:3000/')
+    get(`http://localhost:${port}/`)
   }, 1000)
 })
