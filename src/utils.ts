@@ -214,7 +214,8 @@ export const compileTrust = val => {
 
   if (typeof val === 'string') {
     // Support comma-separated values
-    val = val.split(/ *, */)
+    val = val.split(',')
+    val = val.map(v => v.trim())
   }
 
   return proxyaddr.compile(val || [])
