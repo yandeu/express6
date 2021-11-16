@@ -9,6 +9,8 @@
 
 import pathRegexp from 'path-to-regexp'
 import _debug from 'debug'
+import type { Request, Response, NextFunction } from '../types'
+import type { Route } from '../types'
 
 const debug = _debug('express:router:layer')
 const hasOwnProperty = Object.prototype.hasOwnProperty
@@ -17,15 +19,25 @@ const hasOwnProperty = Object.prototype.hasOwnProperty
 const isPromise = val =>
   val && typeof val === 'object' && typeof val.then === 'function' && typeof val.catch === 'function'
 
+interface ExtendedRegExp extends RegExp {
+  fast_slash: boolean
+  fast_star: boolean
+}
+
+interface Handler {
+  (req: Request, res: Response, next: NextFunction): Promise<any>
+  (err: Error, req: Request, res: Response, next: NextFunction): Promise<any>
+}
+
 export class Layer {
-  handle: any
-  name: any
-  params: any
-  path: any
-  regexp: any
+  handle: Handler
   keys: any[] = []
-  method: any
-  route: any
+  method: string | undefined
+  name: string
+  params: any
+  path: string | undefined
+  regexp!: ExtendedRegExp
+  route: Route | undefined
 
   constructor(path, options, fn) {
     debug('new %o', path)
@@ -42,16 +54,8 @@ export class Layer {
     this.regexp.fast_slash = path === '/' && opts.end === false
   }
 
-  /**
-   * Handle the error for the layer.
-   *
-   * @param {Error} error
-   * @param {Request} req
-   * @param {Response} res
-   * @param {function} next
-   * @api private
-   */
-  handle_error(error, req, res, next) {
+  /** Handle the error for the layer. */
+  private handle_error(error: any, req: Request, res: Response, next: NextFunction) {
     const fn = this.handle
 
     if (fn.length !== 4) {
@@ -62,7 +66,7 @@ export class Layer {
     // handle UnhandledPromiseRejection
     try {
       // invoke function
-      var ret = fn(error, req, res, next)
+      const ret = fn(error, req, res, next)
 
       // wait for returned promise
       if (isPromise(ret)) {
@@ -75,15 +79,8 @@ export class Layer {
     }
   }
 
-  /**
-   * Handle the request for the layer.
-   *
-   * @param {Request} req
-   * @param {Response} res
-   * @param {function} next
-   * @api private
-   */
-  handle_request(req, res, next) {
+  /** Handle the request for the layer. */
+  private handle_request(req: Request, res: Response, next: NextFunction) {
     const fn = this.handle
 
     if (fn.length > 3) {
@@ -110,13 +107,9 @@ export class Layer {
   /**
    * Check if this route matches `path`, if so
    * populate `.params`.
-   *
-   * @param {String} path
-   * @return {Boolean}
-   * @api private
    */
-  match(path) {
-    let match
+  private match(path: string): boolean {
+    let match: RegExpExecArray | null | undefined
 
     if (path != null) {
       // fast path non-ending match for / (any path matches)
@@ -133,7 +126,6 @@ export class Layer {
         return true
       }
 
-      // match the path
       match = this.regexp.exec(path)
     }
 
@@ -164,14 +156,8 @@ export class Layer {
   }
 }
 
-/**
- * Decode param value.
- *
- * @param {string} val
- * @return {string}
- * @private
- */
-function decode_param(val) {
+/** Decode param value. */
+function decode_param(val: string): string {
   if (typeof val !== 'string' || val.length === 0) {
     return val
   }
