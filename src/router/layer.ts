@@ -28,11 +28,6 @@ export class Layer {
   route: any
 
   constructor(path, options, fn) {
-    if (!(this instanceof Layer)) {
-      // @ts-ignore
-      return new Layer(path, options, fn)
-    }
-
     debug('new %o', path)
     const opts = options || {}
 
