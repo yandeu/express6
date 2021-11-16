@@ -13,6 +13,12 @@ import fs from 'fs'
 
 const debug = d('express:view')
 
+interface ViewOptions {
+  defaultEngine: string
+  root: string
+  engines: any
+}
+
 /**
  * Initialize a new `View` with the given `name`.
  *
@@ -21,27 +27,20 @@ const debug = d('express:view')
  *   - `defaultEngine` the default template engine name
  *   - `engines` template engine require() cache
  *   - `root` root path for view lookup
- *
- * @param {string} name
- * @param {object} options
- * @public
  */
-
 export class View {
-  defaultEngine: any
+  defaultEngine: string
   ext: string
-  name: any
-  root: any
+  name: string
+  root: string
   engine: any
-  path: any
+  path: string
 
-  constructor(name, options) {
-    const opts = options || {}
-
-    this.defaultEngine = opts.defaultEngine
+  constructor(name: string, options: ViewOptions) {
+    this.defaultEngine = options.defaultEngine
     this.ext = extname(name)
     this.name = name
-    this.root = opts.root
+    this.root = options.root
 
     if (!this.ext && !this.defaultEngine) {
       throw new Error('No default engine was specified and no extension was provided.')
@@ -56,7 +55,7 @@ export class View {
       fileName += this.ext
     }
 
-    if (!opts.engines[this.ext]) {
+    if (!options.engines[this.ext]) {
       // load engine
       const mod = this.ext.substr(1)
       debug('require "%s"', mod)
@@ -68,26 +67,20 @@ export class View {
         throw new Error(`Module "${mod}" does not provide a view engine.`)
       }
 
-      opts.engines[this.ext] = fn
+      options.engines[this.ext] = fn
     }
 
     // store loaded engine
-    this.engine = opts.engines[this.ext]
+    this.engine = options.engines[this.ext]
 
     // lookup path
     this.path = this.lookup(fileName)
   }
 
-  /**
-   * Lookup view by the given `name`
-   *
-   * @param {string} name
-   * @private
-   */
-
-  lookup(name) {
+  /** Lookup view by the given `name` */
+  private lookup(name: string): string {
     let path
-    const roots = [].concat(this.root)
+    const roots: string[] = ([] as string[]).concat(this.root)
 
     debug('lookup "%s"', name)
 
@@ -120,7 +113,7 @@ export class View {
 
       // copy arguments
       const args = new Array(arguments.length)
-      const cntx = this
+      const ctx = this
 
       for (let i = 0; i < arguments.length; i++) {
         args[i] = arguments[i]
@@ -128,22 +121,15 @@ export class View {
 
       // force callback to be async
       return process.nextTick(function renderTick() {
-        return callback.apply(cntx, args)
+        return callback.apply(ctx, args)
       })
     })
 
     sync = false
   }
 
-  /**
-   * Resolve the file within the given directory.
-   *
-   * @param {string} dir
-   * @param {string} file
-   * @private
-   */
-
-  resolve(dir, file) {
+  /** Resolve the file within the given directory. */
+  private resolve(dir: string, file: string): string | undefined {
     const ext = this.ext
 
     // <path>.<ext>
@@ -164,15 +150,8 @@ export class View {
   }
 }
 
-/**
- * Return a stat, maybe.
- *
- * @param {string} path
- * @return {fs.Stats}
- * @private
- */
-
-function tryStat(path) {
+/** Return a stat, maybe. */
+function tryStat(path: string): fs.Stats | undefined {
   debug('stat "%s"', path)
 
   try {
