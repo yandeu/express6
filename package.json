@@ -1,6 +1,6 @@
 {
   "name": "express6",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "🏅 Modern, fast, unopinionated, minimalist web framework.",
   "main": "./lib/express.js",
   "types": "./lib/express.d.ts",
@@ -23,7 +23,10 @@
     "test-ci": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require test/support/env --reporter spec --check-leaks test/ test/acceptance/",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --require test/support/env --reporter dot --check-leaks test/ test/acceptance/",
     "test-tap": "mocha --require test/support/env --reporter tap --check-leaks test/ test/acceptance/",
-    "prepublishOnly": "npm i && npm run build"
+    "publish": "npx publish-cli@latest",
+    "preReleaseHook": "updatePackageLock build test",
+    "prepublishOnly": "npm i && npm run build",
+    "updatePackageLock": "npm i --package-lock-only"
   },
   "keywords": [
     "express",
