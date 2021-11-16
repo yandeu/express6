@@ -12,7 +12,7 @@ import { isIP } from 'net'
 import typeis from 'type-is'
 import { IncomingMessage } from 'http'
 import fresh from 'fresh'
-import parseRange from 'range-parser'
+import parseRange, { Ranges, Result } from 'range-parser'
 import parse from 'parseurl'
 import proxyaddr from 'proxy-addr'
 
@@ -22,6 +22,8 @@ class Request extends IncomingMessage {
   params: any = {}
   body: any = {}
   url!: string
+  next!: any
+  secret!: string
 
   /**
    * Return request header.
@@ -41,12 +43,8 @@ class Request extends IncomingMessage {
    *     // => undefined
    *
    * Aliased as `req.header()`.
-   *
-   * @param {String} name
-   * @return {String}
-   * @public
    */
-  header(name) {
+  public header(name: string): string {
     if (!name) {
       throw new TypeError('name argument is required to req.get')
     }
@@ -60,13 +58,13 @@ class Request extends IncomingMessage {
     switch (lc) {
       case 'referer':
       case 'referrer':
-        return this.headers.referrer || this.headers.referer
+        return (this.headers.referrer || this.headers.referer) as string
       default:
-        return this.headers[lc]
+        return this.headers[lc] as string
     }
   }
 
-  get(name) {
+  get(name: string): string {
     return this.header(name)
   }
 
@@ -113,15 +111,14 @@ class Request extends IncomingMessage {
    *
    * @param {String|Array} type(s)
    * @return {String|Array|Boolean}
-   * @public
    */
-  accepts() {
+  public accepts(...args) {
     const accept = accepts(this)
-    return accept.types(...arguments)
+    return accept.types(...args)
   }
 
   /** Check if the given `encoding`s are accepted. */
-  public acceptsEncodings(...encoding: string[]): string | string[] {
+  public acceptsEncodings(...encoding: string[]): string | false {
     const accept = accepts(this)
     return accept.encodings(...encoding)
   }
@@ -130,7 +127,7 @@ class Request extends IncomingMessage {
    * Check if the given `charset`s are acceptable,
    * otherwise you should respond with 406 "Not Acceptable".
    */
-  public acceptsCharsets(...charset: string[]): string | string[] {
+  public acceptsCharsets(...charset: string[]): string | false {
     const accept = accepts(this)
     return accept.charsets(...charset)
   }
@@ -139,7 +136,7 @@ class Request extends IncomingMessage {
    * Check if the given `lang`s are acceptable,
    * otherwise you should respond with 406 "Not Acceptable".
    */
-  public acceptsLanguages(...lang: string[]): string | string[] {
+  public acceptsLanguages(...lang: string[]): string | false {
     const accept = accepts(this)
     return accept.languages(...lang)
   }
@@ -162,7 +159,7 @@ class Request extends IncomingMessage {
    * NOTE: remember that ranges are inclusive, so for example "Range: users=0-3"
    * should respond with 4 users when available, not 3.
    */
-  public range(size: number, options: { combine?: boolean } = {}): number | number[] | undefined {
+  public range(size: number, options: { combine?: boolean } = {}): Result | Ranges | undefined {
     const { combine = false } = options
     const range = this.get('Range')
     if (!range) return
@@ -177,14 +174,9 @@ class Request extends IncomingMessage {
    */
   get query(): string {
     const queryparse = this.app.get('query parser fn')
+    if (!queryparse) return Object.create(null) // parsing is disabled
 
-    if (!queryparse) {
-      // parsing is disabled
-      return Object.create(null)
-    }
-
-    const querystring = parse(this).query
-
+    const querystring = parse(this)?.query
     return queryparse(querystring)
   }
 

@@ -21,6 +21,8 @@ import { normalizeType, normalizeTypes, setCharset } from './utils.js'
 import cookie from 'cookie'
 import send, { mime } from 'send'
 import vary from 'vary'
+import { Request } from './types.js'
+import type { Express } from './application.js'
 
 const charsetRegExp = /;\s*charset\s*=/
 
@@ -33,8 +35,8 @@ const getStatusCode = (status: any) => {
 }
 
 class Response extends ServerResponse {
-  req: any
-  app: any
+  req!: Request
+  app!: Express
   locals: any
 
   /** Set status `code`. */
@@ -483,7 +485,7 @@ class Response extends ServerResponse {
 
     this.vary('Accept')
 
-    if (key) {
+    if (key && typeof key === 'string') {
       this.set('Content-Type', normalizeType(key).value)
       obj[key](req, this, next)
     } else if (fn) {
@@ -603,7 +605,7 @@ class Response extends ServerResponse {
 
   /** Clear cookie `name`. */
   public clearCookie(name: string, options: any): this {
-    const opts = merge({ expires: new Date(1), path: '/' }, options)
+    const opts = { expires: new Date(1), path: '/', ...options }
     return this.cookie(name, '', opts)
   }
 
@@ -623,36 +625,28 @@ class Response extends ServerResponse {
    *
    *    // same as above
    *    res.cookie('rememberme', '1', { maxAge: 900000, httpOnly: true })
-   *
-   * @param {String} name
-   * @param {String|Object} value
-   * @param {Object} [options]
-   * @return {ServerResponse} for chaining
-   * @public
    */
-  cookie(name, value, options) {
-    const opts = merge({}, options)
+  public cookie(
+    name: string,
+    value: string | Object,
+    options: { expires?: Date; maxAge?: number; signed?: boolean; path?: string } = {}
+  ): this {
+    const opts = { ...options }
     const secret = this.req.secret
     const signed = opts.signed
 
-    if (signed && !secret) {
-      throw new Error('cookieParser("secret") required for signed cookies')
-    }
+    if (signed && !secret) throw new Error('cookieParser("secret") required for signed cookies')
 
     let val = typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value)
 
-    if (signed) {
-      val = `s:${sign(val, secret)}`
-    }
+    if (signed) val = `s:${sign(val, secret)}`
 
-    if ('maxAge' in opts) {
+    if (typeof opts.maxAge !== 'undefined') {
       opts.expires = new Date(Date.now() + opts.maxAge)
       opts.maxAge /= 1000
     }
 
-    if (opts.path == null) {
-      opts.path = '/'
-    }
+    if (opts.path == null) opts.path = '/'
 
     this.append('Set-Cookie', cookie.serialize(name, String(val), opts))
 
@@ -675,9 +669,7 @@ class Response extends ServerResponse {
     let loc = url
 
     // "back" is an alias for the referrer
-    if (url === 'back') {
-      loc = this.req.get('Referrer') || '/'
-    }
+    if (url === 'back') loc = (this.req.get('Referrer') as string) || '/'
 
     // set location
     return this.set('Location', encodeUrl(loc))
@@ -749,7 +741,6 @@ class Response extends ServerResponse {
    */
   vary(field) {
     vary(this, field)
-
     return this
   }
 
