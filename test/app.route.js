@@ -1,6 +1,8 @@
 const express = require('../')
 const request = require('supertest')
 
+const describePromises = global.Promise ? describe : describe.skip
+
 describe('app.route', () => {
   it('should return a new route', done => {
     const app = express()
@@ -51,5 +53,126 @@ describe('app.route', () => {
     app.route('/:foo')
 
     request(app).get('/test').expect(404, done)
+  })
+
+  describePromises('promise support', () => {
+    it('should pass rejected promise value', done => {
+      const app = express()
+      const route = app.route('/foo')
+
+      route.all(function createError(req, res, next) {
+        return Promise.reject(new Error('boom!'))
+      })
+
+      route.all(function helloWorld(req, res) {
+        res.send('hello, world!')
+      })
+
+      route.all(function handleError(err, req, res, next) {
+        res.status(500)
+        res.send('caught: ' + err.message)
+      })
+
+      request(app).get('/foo').expect(500, 'caught: boom!', done)
+    })
+
+    it('should pass rejected promise without value', done => {
+      const app = express()
+      const route = app.route('/foo')
+
+      route.all(function createError(req, res, next) {
+        return Promise.reject()
+      })
+
+      route.all(function helloWorld(req, res) {
+        res.send('hello, world!')
+      })
+
+      route.all(function handleError(err, req, res, next) {
+        res.status(500)
+        res.send('caught: ' + err.message)
+      })
+
+      request(app).get('/foo').expect(500, 'caught: Rejected promise', done)
+    })
+
+    it('should ignore resolved promise', done => {
+      const app = express()
+      const route = app.route('/foo')
+
+      route.all(function createError(req, res, next) {
+        res.send('saw GET /foo')
+        return Promise.resolve('foo')
+      })
+
+      route.all(() => {
+        done(new Error('Unexpected route invoke'))
+      })
+
+      request(app).get('/foo').expect(200, 'saw GET /foo', done)
+    })
+
+    describe('error handling', () => {
+      it('should pass rejected promise value', done => {
+        const app = express()
+        const route = app.route('/foo')
+
+        route.all(function createError(req, res, next) {
+          return Promise.reject(new Error('boom!'))
+        })
+
+        route.all(function handleError(err, req, res, next) {
+          return Promise.reject(new Error('caught: ' + err.message))
+        })
+
+        route.all(function handleError(err, req, res, next) {
+          res.status(500)
+          res.send('caught again: ' + err.message)
+        })
+
+        request(app).get('/foo').expect(500, 'caught again: caught: boom!', done)
+      })
+
+      it('should pass rejected promise without value', done => {
+        const app = express()
+        const route = app.route('/foo')
+
+        route.all(function createError(req, res, next) {
+          return Promise.reject(new Error('boom!'))
+        })
+
+        route.all(function handleError(err, req, res, next) {
+          return Promise.reject()
+        })
+
+        route.all(function handleError(err, req, res, next) {
+          res.status(500)
+          res.send('caught again: ' + err.message)
+        })
+
+        request(app).get('/foo').expect(500, 'caught again: Rejected promise', done)
+      })
+
+      it('should ignore resolved promise', done => {
+        const app = express()
+        const route = app.route('/foo')
+
+        route.all(function createError(req, res, next) {
+          return Promise.reject(new Error('boom!'))
+        })
+
+        route.all(function handleError(err, req, res, next) {
+          res.status(500)
+          res.send('caught: ' + err.message)
+          return Promise.resolve('foo')
+        })
+
+        route.all(() => {
+          done(new Error('Unexpected route invoke'))
+        })
+
+        request(app).get('/foo').expect(500, 'caught: boom!', done)
+      })
+    })
   })
 })
