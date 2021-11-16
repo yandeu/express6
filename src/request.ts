@@ -16,8 +16,6 @@ import parseRange from 'range-parser'
 import parse from 'parseurl'
 import proxyaddr from 'proxy-addr'
 
-// let req = Object.create(http.IncomingMessage.prototype)
-
 class Request extends IncomingMessage {
   app: any
   res: any
@@ -48,7 +46,6 @@ class Request extends IncomingMessage {
    * @return {String}
    * @public
    */
-
   header(name) {
     if (!name) {
       throw new TypeError('name argument is required to req.get')
@@ -118,7 +115,6 @@ class Request extends IncomingMessage {
    * @return {String|Array|Boolean}
    * @public
    */
-
   accepts() {
     const accept = accepts(this)
     return accept.types(...arguments)
@@ -415,7 +411,6 @@ class Request extends IncomingMessage {
    * @return {Boolean}
    * @public
    */
-
   get stale() {
     return !this.fresh
   }
@@ -426,27 +421,10 @@ class Request extends IncomingMessage {
    * @return {Boolean}
    * @public
    */
-
   get xhr() {
     const val = this.get('X-Requested-With') || ('' as any)
     return val.toLowerCase() === 'xmlhttprequest'
   }
 }
 
-// /**
-//  * Helper function for creating a getter on an object.
-//  *
-//  * @param {Object} obj
-//  * @param {String} name
-//  * @param {Function} getter
-//  * @private
-//  */
-// function defineGetter(obj, name, getter) {
-//   Object.defineProperty(obj, name, {
-//     configurable: true,
-//     enumerable: true,
-//     get: getter
-//   })
-// }
-
-export const _req = Object.create(Request.prototype) as Request
+export const req = Object.create(Request.prototype) as Request

@@ -1,8 +1,8 @@
-import type { _req } from './request.js'
-import type { _res } from './response.js'
+import type { req } from './request.js'
+import type { res } from './response.js'
 
-export type Request = typeof _req
-export type Response = typeof _res
+export type Request = typeof req
+export type Response = typeof res
 
 export interface NextFunction {
   (err?: any): void

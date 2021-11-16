@@ -24,13 +24,10 @@ import vary from 'vary'
 
 const charsetRegExp = /;\s*charset\s*=/
 
-// export let res = Object.create(http.ServerResponse.prototype)
-
 const getStatusCode = (status: any) => {
   try {
-    const code = statuses(status)
-    return code
-  } catch (error) {
+    return statuses(status)
+  } catch (err: any) {
     return String(status)
   }
 }
@@ -75,7 +72,6 @@ class Response extends ServerResponse {
    * res.send({ some: 'json' });
    * res.send('<p>some html</p>');
    */
-
   public send(body: any) {
     let chunk = body
     let encoding
@@ -475,7 +471,6 @@ class Response extends ServerResponse {
    * a `.default` callback it will be invoked
    * instead.
    */
-
   public format(obj): this {
     const req = this.req
     const next = req.next
@@ -752,7 +747,6 @@ class Response extends ServerResponse {
    * @return {ServerResponse} for chaining
    * @public
    */
-
   vary(field) {
     vary(this, field)
 
@@ -769,7 +763,6 @@ class Response extends ServerResponse {
    *  - `cache`     boolean hinting to the engine it should cache
    *  - `filename`  filename of the view being rendered
    */
-
   public render(view, options, callback) {
     const app = this.req.app
     let done = callback
@@ -801,13 +794,11 @@ class Response extends ServerResponse {
 
 // pipe the send file stream
 const sendfile = (res, file, options, callback) => {
-  console.log('sendfile')
   let done = false
   let streaming
 
   // request aborted
   function onaborted() {
-    console.log('onaborted')
     if (done) return
     done = true
 
@@ -819,7 +810,6 @@ const sendfile = (res, file, options, callback) => {
 
   // directory
   function ondirectory() {
-    console.log('ondirectory')
     if (done) return
     done = true
 
@@ -831,7 +821,6 @@ const sendfile = (res, file, options, callback) => {
 
   // errors
   function onerror(err) {
-    console.log('onerror')
     if (done) return
     done = true
     callback(err)
@@ -839,7 +828,6 @@ const sendfile = (res, file, options, callback) => {
 
   // ended
   function onend() {
-    console.log('onend')
     if (done) return
     done = true
     callback()
@@ -847,13 +835,11 @@ const sendfile = (res, file, options, callback) => {
 
   // file
   function onfile() {
-    console.log('onfile')
     streaming = false
   }
 
   // finished
   function onfinish(err) {
-    console.log('onfinish')
     if (err && err.code === 'ECONNRESET') return onaborted()
     if (err) return onerror(err)
     if (done) return
@@ -872,7 +858,6 @@ const sendfile = (res, file, options, callback) => {
 
   // streaming
   function onstream() {
-    console.log('onstream')
     streaming = true
   }
 
@@ -884,7 +869,6 @@ const sendfile = (res, file, options, callback) => {
   onFinished(res, onfinish)
 
   if (options.headers) {
-    console.log('options.headers')
     // set headers on successful transfer
     file.on('headers', function headers(res) {
       const obj = options.headers
@@ -912,7 +896,6 @@ const sendfile = (res, file, options, callback) => {
  * @returns {string}
  * @private
  */
-
 const stringify = (value, replacer, spaces, escape) => {
   // v8 checks arguments.length for optimizing simple call
   // https://bugs.chromium.org/p/v8/issues/detail?id=4730
@@ -937,4 +920,4 @@ const stringify = (value, replacer, spaces, escape) => {
   return json
 }
 
-export const _res = Object.create(Response.prototype) as Response
+export const res = Object.create(Response.prototype) as Response

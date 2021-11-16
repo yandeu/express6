@@ -13,11 +13,13 @@ import methods from 'methods'
 import _debug from 'debug'
 import { View } from './view.js'
 import http from 'http'
-import { compileETag, compileQueryParser, compileTrust } from './utils.js'
+import { applyMixins, compileETag, compileQueryParser, compileTrust } from './utils.js'
 import { flatten } from 'array-flatten'
 import merge from 'utils-merge'
 import { resolve } from 'path'
+import { EventEmitter } from 'events'
 import type { Request, Response, RequestHandler, GetSettings, RESTFunction } from './types.js'
+import { ExtensibleFunction } from './utils.js'
 
 const debug = _debug('express:application')
 const slice = Array.prototype.slice
@@ -25,13 +27,16 @@ const slice = Array.prototype.slice
 /** Variable for trust proxy inheritance back-compat */
 const trustProxyDefaultSymbol = '@@symbol:trust_proxy_default'
 
-class Express {
+class Express extends ExtensibleFunction<RequestHandler> {
   cache: any = {}
   engines: any = {}
   settings: any = {}
   locals: any
   mountpath!: string
   parent: any
+
+  request!: Request
+  response!: Response
 
   private _router: any
 
@@ -43,6 +48,12 @@ class Express {
   options!: RESTFunction
   head!: RESTFunction
 
+  constructor() {
+    super((req, res, next) => {
+      return this.handle(req, res, next)
+    })
+  }
+
   /**
    * Initialize the server.
    *
@@ -50,7 +61,6 @@ class Express {
    *   - setup default middleware
    *   - setup route reflection methods
    */
-
   private init() {
     this.cache = {}
     this.engines = {}
@@ -120,10 +130,6 @@ class Express {
         )
       }
     }) */
-  }
-
-  on(arg0: string, arg1: (parent: any) => void) {
-    throw new Error('Method not implemented.')
   }
 
   /** Getting lazily added base router. */
@@ -576,6 +582,11 @@ function tryRender(view, options, callback) {
     callback(err)
   }
 }
+
+/** Create an express application. */
+// eslint-disable-next-line no-redeclare
+interface Express extends EventEmitter {}
+applyMixins(Express, [EventEmitter])
 
 export default Express
 export { Express }

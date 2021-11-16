@@ -7,31 +7,17 @@
  * MIT Licensed
  */
 
-/**
- * Module dependencies.
- */
+/** Module dependencies. */
 import bodyParser from 'body-parser'
-import { EventEmitter } from 'events'
-import mixin from 'merge-descriptors'
-import app_proto from './application.js'
+import { Express } from './application.js'
 import { Route } from './router/route.js'
 import { Router } from './router/index.js'
-import { _req as req } from './request.js'
-import { _res as res } from './response.js'
+import { req } from './request.js'
+import { res } from './response.js'
 
-/**
- * Create an express application.
- *
- * @return {Function}
- * @api public
- */
+/** Create an express application. */
 const createApplication = () => {
-  const app: any = function (req, res, next) {
-    app.handle(req, res, next)
-  }
-
-  mixin(app, EventEmitter.prototype, false)
-  mixin(app, app_proto.prototype, false)
+  const app = new Express()
 
   // expose the prototype that will get set on requests
   app.request = Object.create(req, {
@@ -43,37 +29,27 @@ const createApplication = () => {
     app: { configurable: true, enumerable: true, writable: true, value: app }
   })
 
+  // @ts-ignore
   app.init()
-  return app as app_proto
+  return app as Express
 }
 
 export default createApplication
 export { createApplication as express }
 
-/**
- * Expose the prototypes.
- */
-
+/** Expose the prototypes. */
 export { Express as application } from './application.js'
-export { _req as request } from './request.js'
-export { _res as response } from './response.js'
+export { req as request } from './request.js'
+export { res as response } from './response.js'
 
-/**
- * Expose constructors.
- */
-
+/** Expose constructors. */
 export { Route }
 export { Router }
 
-/**
- * Export Types
- */
+/** Export Types */
 export * from './types.js'
 
-/**
- * Expose middleware
- */
-
+/** Expose middleware */
 const { json, raw, text, urlencoded } = bodyParser
 export { json, raw, text, urlencoded }
 import _static from 'serve-static'
