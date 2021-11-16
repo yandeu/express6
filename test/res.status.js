@@ -1,20 +1,16 @@
+const express = require('../'),
+  request = require('supertest')
 
-var express = require('../')
-  , request = require('supertest');
+describe('res', () => {
+  describe('.status(code)', () => {
+    it('should set the response .statusCode', done => {
+      const app = express()
 
-describe('res', function(){
-  describe('.status(code)', function(){
-    it('should set the response .statusCode', function(done){
-      var app = express();
+      app.use((req, res) => {
+        res.status(201).end('Created')
+      })
 
-      app.use(function(req, res){
-        res.status(201).end('Created');
-      });
-
-      request(app)
-      .get('/')
-      .expect('Created')
-      .expect(201, done);
+      request(app).get('/').expect('Created').expect(201, done)
     })
   })
 })

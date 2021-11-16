@@ -1,62 +1,50 @@
+const express = require('../'),
+  request = require('supertest')
 
-var express = require('../')
-  , request = require('supertest');
+describe('req', () => {
+  describe('.xhr', () => {
+    it('should return true when X-Requested-With is xmlhttprequest', done => {
+      const app = express()
 
-describe('req', function(){
-  describe('.xhr', function(){
-    it('should return true when X-Requested-With is xmlhttprequest', function(done){
-      var app = express();
-
-      app.use(function(req, res){
+      app.use((req, res) => {
         req.xhr.should.be.true()
-        res.end();
-      });
+        res.end()
+      })
 
-      request(app)
-      .get('/')
-      .set('X-Requested-With', 'xmlhttprequest')
-      .expect(200, done)
+      request(app).get('/').set('X-Requested-With', 'xmlhttprequest').expect(200, done)
     })
 
-    it('should case-insensitive', function(done){
-      var app = express();
+    it('should case-insensitive', done => {
+      const app = express()
 
-      app.use(function(req, res){
+      app.use((req, res) => {
         req.xhr.should.be.true()
-        res.end();
-      });
+        res.end()
+      })
 
-      request(app)
-      .get('/')
-      .set('X-Requested-With', 'XMLHttpRequest')
-      .expect(200, done)
+      request(app).get('/').set('X-Requested-With', 'XMLHttpRequest').expect(200, done)
     })
 
-    it('should return false otherwise', function(done){
-      var app = express();
+    it('should return false otherwise', done => {
+      const app = express()
 
-      app.use(function(req, res){
+      app.use((req, res) => {
         req.xhr.should.be.false()
-        res.end();
-      });
+        res.end()
+      })
 
-      request(app)
-      .get('/')
-      .set('X-Requested-With', 'blahblah')
-      .expect(200, done)
+      request(app).get('/').set('X-Requested-With', 'blahblah').expect(200, done)
     })
 
-    it('should return false when not present', function(done){
-      var app = express();
+    it('should return false when not present', done => {
+      const app = express()
 
-      app.use(function(req, res){
+      app.use((req, res) => {
         req.xhr.should.be.false()
-        res.end();
-      });
+        res.end()
+      })
 
-      request(app)
-      .get('/')
-      .expect(200, done)
+      request(app).get('/').expect(200, done)
     })
   })
 })

@@ -1,39 +1,34 @@
+const express = require('../'),
+  request = require('supertest')
 
-var express = require('../')
-  , request = require('supertest');
+describe('res', () => {
+  describe('.locals', () => {
+    it('should be empty by default', done => {
+      const app = express()
 
-describe('res', function(){
-  describe('.locals', function(){
-    it('should be empty by default', function(done){
-      var app = express();
-
-      app.use(function(req, res){
+      app.use((req, res) => {
         res.json(res.locals)
-      });
+      })
 
-      request(app)
-      .get('/')
-      .expect(200, {}, done)
+      request(app).get('/').expect(200, {}, done)
     })
   })
 
-  it('should work when mounted', function(done){
-    var app = express();
-    var blog = express();
+  it('should work when mounted', done => {
+    const app = express()
+    const blog = express()
 
-    app.use(blog);
+    app.use(blog)
 
-    blog.use(function(req, res, next){
-      res.locals.foo = 'bar';
-      next();
-    });
+    blog.use((req, res, next) => {
+      res.locals.foo = 'bar'
+      next()
+    })
 
-    app.use(function(req, res){
+    app.use((req, res) => {
       res.json(res.locals)
-    });
+    })
 
-    request(app)
-    .get('/')
-    .expect(200, { foo: 'bar' }, done)
+    request(app).get('/').expect(200, { foo: 'bar' }, done)
   })
 })

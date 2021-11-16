@@ -1,11 +1,10 @@
-
 /**
  * Module dependencies.
  * @private
  */
 
-var assert = require('assert');
-var Buffer = require('safe-buffer').Buffer
+const assert = require('assert')
+const Buffer = require('safe-buffer').Buffer
 
 /**
  * Module exports.
@@ -14,7 +13,7 @@ var Buffer = require('safe-buffer').Buffer
 
 exports.shouldHaveBody = shouldHaveBody
 exports.shouldNotHaveBody = shouldNotHaveBody
-exports.shouldNotHaveHeader = shouldNotHaveHeader;
+exports.shouldNotHaveHeader = shouldNotHaveHeader
 
 /**
  * Assert that a supertest response has a specific body.
@@ -23,11 +22,9 @@ exports.shouldNotHaveHeader = shouldNotHaveHeader;
  * @returns {function}
  */
 
-function shouldHaveBody (buf) {
-  return function (res) {
-    var body = !Buffer.isBuffer(res.body)
-      ? Buffer.from(res.text)
-      : res.body
+function shouldHaveBody(buf) {
+  return res => {
+    const body = !Buffer.isBuffer(res.body) ? Buffer.from(res.text) : res.body
     assert.ok(body, 'response has body')
     assert.strictEqual(body.toString('hex'), buf.toString('hex'))
   }
@@ -39,8 +36,8 @@ function shouldHaveBody (buf) {
  * @returns {function}
  */
 
-function shouldNotHaveBody () {
-  return function (res) {
+function shouldNotHaveBody() {
+  return res => {
     assert.ok(res.text === '' || res.text === undefined)
   }
 }
@@ -52,7 +49,7 @@ function shouldNotHaveBody () {
  * @returns {function}
  */
 function shouldNotHaveHeader(header) {
-  return function (res) {
-    assert.ok(!(header.toLowerCase() in res.headers), `should not have header ${  header}`);
-  };
+  return res => {
+    assert.ok(!(header.toLowerCase() in res.headers), `should not have header ${header}`)
+  }
 }

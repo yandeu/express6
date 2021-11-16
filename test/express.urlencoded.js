@@ -1,10 +1,9 @@
+const assert = require('assert')
+const Buffer = require('safe-buffer').Buffer
+const express = require('..')
+const request = require('supertest')
 
-var assert = require('assert')
-var Buffer = require('safe-buffer').Buffer
-var express = require('..')
-var request = require('supertest')
-
-describe('express.urlencoded()', function () {
+describe('express.urlencoded()', () => {
   before(function () {
     this.app = createApp()
   })
@@ -17,17 +16,17 @@ describe('express.urlencoded()', function () {
       .expect(200, '{"user":"tobi"}', done)
   })
 
-  it('should 400 when invalid content-length', function (done) {
-    var app = express()
+  it('should 400 when invalid content-length', done => {
+    const app = express()
 
-    app.use(function (req, res, next) {
+    app.use((req, res, next) => {
       req.headers['content-length'] = '20' // bad length
       next()
     })
 
     app.use(express.urlencoded())
 
-    app.post('/', function (req, res) {
+    app.post('/', (req, res) => {
       res.json(req.body)
     })
 
@@ -47,7 +46,7 @@ describe('express.urlencoded()', function () {
       .expect(200, '{}', done)
   })
 
-  it('should handle empty message-body', function (done) {
+  it('should handle empty message-body', done => {
     request(createApp({ limit: '1kb' }))
       .post('/')
       .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -56,13 +55,13 @@ describe('express.urlencoded()', function () {
       .expect(200, '{}', done)
   })
 
-  it('should handle duplicated middleware', function (done) {
-    var app = express()
+  it('should handle duplicated middleware', done => {
+    const app = express()
 
     app.use(express.urlencoded())
     app.use(express.urlencoded())
 
-    app.post('/', function (req, res) {
+    app.post('/', (req, res) => {
       res.json(req.body)
     })
 
@@ -81,8 +80,8 @@ describe('express.urlencoded()', function () {
       .expect(200, '{"user":{"name":{"first":"Tobi"}}}', done)
   })
 
-  describe('with extended option', function () {
-    describe('when false', function () {
+  describe('with extended option', () => {
+    describe('when false', () => {
       before(function () {
         this.app = createApp({ extended: false })
       })
@@ -104,7 +103,7 @@ describe('express.urlencoded()', function () {
       })
     })
 
-    describe('when true', function () {
+    describe('when true', () => {
       before(function () {
         this.app = createApp({ extended: true })
       })
@@ -150,18 +149,18 @@ describe('express.urlencoded()', function () {
       })
 
       it('should parse array index notation with large array', function (done) {
-        var str = 'f[0]=0'
+        let str = 'f[0]=0'
 
-        for (var i = 1; i < 500; i++) {
-          str += `&f[${  i  }]=${  i.toString(16)}`
+        for (let i = 1; i < 500; i++) {
+          str += `&f[${i}]=${i.toString(16)}`
         }
 
         request(this.app)
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
           .send(str)
-          .expect(function (res) {
-            var obj = JSON.parse(res.text)
+          .expect(res => {
+            const obj = JSON.parse(res.text)
             assert.strictEqual(Object.keys(obj).length, 1)
             assert.strictEqual(Array.isArray(obj.f), true)
             assert.strictEqual(obj.f.length, 500)
@@ -178,9 +177,9 @@ describe('express.urlencoded()', function () {
       })
 
       it('should parse deep object', function (done) {
-        var str = 'foo'
+        let str = 'foo'
 
-        for (var i = 0; i < 500; i++) {
+        for (let i = 0; i < 500; i++) {
           str += '[p]'
         }
 
@@ -190,14 +189,16 @@ describe('express.urlencoded()', function () {
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
           .send(str)
-          .expect(function (res) {
-            var obj = JSON.parse(res.text)
+          .expect(res => {
+            const obj = JSON.parse(res.text)
             assert.strictEqual(Object.keys(obj).length, 1)
             assert.strictEqual(typeof obj.foo, 'object')
 
-            var depth = 0
-            var ref = obj.foo
-            while ((ref = ref.p)) { depth++ }
+            let depth = 0
+            let ref = obj.foo
+            while ((ref = ref.p)) {
+              depth++
+            }
             assert.strictEqual(depth, 500)
           })
           .expect(200, done)
@@ -205,14 +206,14 @@ describe('express.urlencoded()', function () {
     })
   })
 
-  describe('with inflate option', function () {
-    describe('when false', function () {
+  describe('with inflate option', () => {
+    describe('when false', () => {
       before(function () {
         this.app = createApp({ inflate: false })
       })
 
       it('should not accept content-encoding', function (done) {
-        var test = request(this.app).post('/')
+        const test = request(this.app).post('/')
         test.set('Content-Encoding', 'gzip')
         test.set('Content-Type', 'application/x-www-form-urlencoded')
         test.write(Buffer.from('1f8b080000000000000bcb4bcc4db57db16e170099a4bad608000000', 'hex'))
@@ -220,13 +221,13 @@ describe('express.urlencoded()', function () {
       })
     })
 
-    describe('when true', function () {
+    describe('when true', () => {
       before(function () {
         this.app = createApp({ inflate: true })
       })
 
       it('should accept content-encoding', function (done) {
-        var test = request(this.app).post('/')
+        const test = request(this.app).post('/')
         test.set('Content-Encoding', 'gzip')
         test.set('Content-Type', 'application/x-www-form-urlencoded')
         test.write(Buffer.from('1f8b080000000000000bcb4bcc4db57db16e170099a4bad608000000', 'hex'))
@@ -235,21 +236,21 @@ describe('express.urlencoded()', function () {
     })
   })
 
-  describe('with limit option', function () {
-    it('should 413 when over limit with Content-Length', function (done) {
-      var buf = Buffer.alloc(1024, '.')
+  describe('with limit option', () => {
+    it('should 413 when over limit with Content-Length', done => {
+      const buf = Buffer.alloc(1024, '.')
       request(createApp({ limit: '1kb' }))
         .post('/')
         .set('Content-Type', 'application/x-www-form-urlencoded')
         .set('Content-Length', '1028')
-        .send(`str=${  buf.toString()}`)
+        .send(`str=${buf.toString()}`)
         .expect(413, done)
     })
 
-    it('should 413 when over limit with chunked encoding', function (done) {
-      var buf = Buffer.alloc(1024, '.')
-      var app = createApp({ limit: '1kb' })
-      var test = request(app).post('/')
+    it('should 413 when over limit with chunked encoding', done => {
+      const buf = Buffer.alloc(1024, '.')
+      const app = createApp({ limit: '1kb' })
+      const test = request(app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.set('Transfer-Encoding', 'chunked')
       test.write('str=')
@@ -257,33 +258,33 @@ describe('express.urlencoded()', function () {
       test.expect(413, done)
     })
 
-    it('should accept number of bytes', function (done) {
-      var buf = Buffer.alloc(1024, '.')
+    it('should accept number of bytes', done => {
+      const buf = Buffer.alloc(1024, '.')
       request(createApp({ limit: 1024 }))
         .post('/')
         .set('Content-Type', 'application/x-www-form-urlencoded')
-        .send(`str=${  buf.toString()}`)
+        .send(`str=${buf.toString()}`)
         .expect(413, done)
     })
 
-    it('should not change when options altered', function (done) {
-      var buf = Buffer.alloc(1024, '.')
-      var options = { limit: '1kb' }
-      var app = createApp(options)
+    it('should not change when options altered', done => {
+      const buf = Buffer.alloc(1024, '.')
+      const options = { limit: '1kb' }
+      const app = createApp(options)
 
       options.limit = '100kb'
 
       request(app)
         .post('/')
         .set('Content-Type', 'application/x-www-form-urlencoded')
-        .send(`str=${  buf.toString()}`)
+        .send(`str=${buf.toString()}`)
         .expect(413, done)
     })
 
-    it('should not hang response', function (done) {
-      var buf = Buffer.alloc(10240, '.')
-      var app = createApp({ limit: '8kb' })
-      var test = request(app).post('/')
+    it('should not hang response', done => {
+      const buf = Buffer.alloc(10240, '.')
+      const app = createApp({ limit: '8kb' })
+      const test = request(app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(buf)
       test.write(buf)
@@ -292,19 +293,23 @@ describe('express.urlencoded()', function () {
     })
   })
 
-  describe('with parameterLimit option', function () {
-    describe('with extended: false', function () {
-      it('should reject 0', function () {
-        assert.throws(createApp.bind(null, { extended: false, parameterLimit: 0 }),
-          /TypeError: option parameterLimit must be a positive number/)
+  describe('with parameterLimit option', () => {
+    describe('with extended: false', () => {
+      it('should reject 0', () => {
+        assert.throws(
+          createApp.bind(null, { extended: false, parameterLimit: 0 }),
+          /TypeError: option parameterLimit must be a positive number/
+        )
       })
 
-      it('should reject string', function () {
-        assert.throws(createApp.bind(null, { extended: false, parameterLimit: 'beep' }),
-          /TypeError: option parameterLimit must be a positive number/)
+      it('should reject string', () => {
+        assert.throws(
+          createApp.bind(null, { extended: false, parameterLimit: 'beep' }),
+          /TypeError: option parameterLimit must be a positive number/
+        )
       })
 
-      it('should 413 if over limit', function (done) {
+      it('should 413 if over limit', done => {
         request(createApp({ extended: false, parameterLimit: 10 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -312,7 +317,7 @@ describe('express.urlencoded()', function () {
           .expect(413, /too many parameters/, done)
       })
 
-      it('should error with type = "parameters.too.many"', function (done) {
+      it('should error with type = "parameters.too.many"', done => {
         request(createApp({ extended: false, parameterLimit: 10 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -321,7 +326,7 @@ describe('express.urlencoded()', function () {
           .expect(413, 'parameters.too.many', done)
       })
 
-      it('should work when at the limit', function (done) {
+      it('should work when at the limit', done => {
         request(createApp({ extended: false, parameterLimit: 10 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -330,7 +335,7 @@ describe('express.urlencoded()', function () {
           .expect(200, done)
       })
 
-      it('should work if number is floating point', function (done) {
+      it('should work if number is floating point', done => {
         request(createApp({ extended: false, parameterLimit: 10.1 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -338,7 +343,7 @@ describe('express.urlencoded()', function () {
           .expect(413, /too many parameters/, done)
       })
 
-      it('should work with large limit', function (done) {
+      it('should work with large limit', done => {
         request(createApp({ extended: false, parameterLimit: 5000 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -347,7 +352,7 @@ describe('express.urlencoded()', function () {
           .expect(200, done)
       })
 
-      it('should work with Infinity limit', function (done) {
+      it('should work with Infinity limit', done => {
         request(createApp({ extended: false, parameterLimit: Infinity }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -357,18 +362,22 @@ describe('express.urlencoded()', function () {
       })
     })
 
-    describe('with extended: true', function () {
-      it('should reject 0', function () {
-        assert.throws(createApp.bind(null, { extended: true, parameterLimit: 0 }),
-          /TypeError: option parameterLimit must be a positive number/)
+    describe('with extended: true', () => {
+      it('should reject 0', () => {
+        assert.throws(
+          createApp.bind(null, { extended: true, parameterLimit: 0 }),
+          /TypeError: option parameterLimit must be a positive number/
+        )
       })
 
-      it('should reject string', function () {
-        assert.throws(createApp.bind(null, { extended: true, parameterLimit: 'beep' }),
-          /TypeError: option parameterLimit must be a positive number/)
+      it('should reject string', () => {
+        assert.throws(
+          createApp.bind(null, { extended: true, parameterLimit: 'beep' }),
+          /TypeError: option parameterLimit must be a positive number/
+        )
       })
 
-      it('should 413 if over limit', function (done) {
+      it('should 413 if over limit', done => {
         request(createApp({ extended: true, parameterLimit: 10 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -376,7 +385,7 @@ describe('express.urlencoded()', function () {
           .expect(413, /too many parameters/, done)
       })
 
-      it('should error with type = "parameters.too.many"', function (done) {
+      it('should error with type = "parameters.too.many"', done => {
         request(createApp({ extended: true, parameterLimit: 10 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -385,7 +394,7 @@ describe('express.urlencoded()', function () {
           .expect(413, 'parameters.too.many', done)
       })
 
-      it('should work when at the limit', function (done) {
+      it('should work when at the limit', done => {
         request(createApp({ extended: true, parameterLimit: 10 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -394,7 +403,7 @@ describe('express.urlencoded()', function () {
           .expect(200, done)
       })
 
-      it('should work if number is floating point', function (done) {
+      it('should work if number is floating point', done => {
         request(createApp({ extended: true, parameterLimit: 10.1 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -402,7 +411,7 @@ describe('express.urlencoded()', function () {
           .expect(413, /too many parameters/, done)
       })
 
-      it('should work with large limit', function (done) {
+      it('should work with large limit', done => {
         request(createApp({ extended: true, parameterLimit: 5000 }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -411,7 +420,7 @@ describe('express.urlencoded()', function () {
           .expect(200, done)
       })
 
-      it('should work with Infinity limit', function (done) {
+      it('should work with Infinity limit', done => {
         request(createApp({ extended: true, parameterLimit: Infinity }))
           .post('/')
           .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -422,8 +431,8 @@ describe('express.urlencoded()', function () {
     })
   })
 
-  describe('with type option', function () {
-    describe('when "application/vnd.x-www-form-urlencoded"', function () {
+  describe('with type option', () => {
+    describe('when "application/vnd.x-www-form-urlencoded"', () => {
       before(function () {
         this.app = createApp({ type: 'application/vnd.x-www-form-urlencoded' })
       })
@@ -445,7 +454,7 @@ describe('express.urlencoded()', function () {
       })
     })
 
-    describe('when ["urlencoded", "application/x-pairs"]', function () {
+    describe('when ["urlencoded", "application/x-pairs"]', () => {
       before(function () {
         this.app = createApp({
           type: ['urlencoded', 'application/x-pairs']
@@ -469,19 +478,15 @@ describe('express.urlencoded()', function () {
       })
 
       it('should ignore application/x-foo', function (done) {
-        request(this.app)
-          .post('/')
-          .set('Content-Type', 'application/x-foo')
-          .send('user=tobi')
-          .expect(200, '{}', done)
+        request(this.app).post('/').set('Content-Type', 'application/x-foo').send('user=tobi').expect(200, '{}', done)
       })
     })
 
-    describe('when a function', function () {
-      it('should parse when truthy value returned', function (done) {
-        var app = createApp({ type: accept })
+    describe('when a function', () => {
+      it('should parse when truthy value returned', done => {
+        const app = createApp({ type: accept })
 
-        function accept (req) {
+        function accept(req) {
           return req.headers['content-type'] === 'application/vnd.something'
         }
 
@@ -492,42 +497,41 @@ describe('express.urlencoded()', function () {
           .expect(200, '{"user":"tobi"}', done)
       })
 
-      it('should work without content-type', function (done) {
-        var app = createApp({ type: accept })
+      it('should work without content-type', done => {
+        const app = createApp({ type: accept })
 
-        function accept (req) {
+        function accept(req) {
           return true
         }
 
-        var test = request(app).post('/')
+        const test = request(app).post('/')
         test.write('user=tobi')
         test.expect(200, '{"user":"tobi"}', done)
       })
 
-      it('should not invoke without a body', function (done) {
-        var app = createApp({ type: accept })
+      it('should not invoke without a body', done => {
+        const app = createApp({ type: accept })
 
-        function accept (req) {
+        function accept(req) {
           throw new Error('oops!')
         }
 
-        request(app)
-          .get('/')
-          .expect(404, done)
+        request(app).get('/').expect(404, done)
       })
     })
   })
 
-  describe('with verify option', function () {
-    it('should assert value if function', function () {
-      assert.throws(createApp.bind(null, { verify: 'lol' }),
-        /TypeError: option verify must be function/)
+  describe('with verify option', () => {
+    it('should assert value if function', () => {
+      assert.throws(createApp.bind(null, { verify: 'lol' }), /TypeError: option verify must be function/)
     })
 
-    it('should error from verify', function (done) {
-      var app = createApp({ verify: function (req, res, buf) {
-        if (buf[0] === 0x20) throw new Error('no leading space')
-      } })
+    it('should error from verify', done => {
+      const app = createApp({
+        verify: function (req, res, buf) {
+          if (buf[0] === 0x20) throw new Error('no leading space')
+        }
+      })
 
       request(app)
         .post('/')
@@ -536,10 +540,12 @@ describe('express.urlencoded()', function () {
         .expect(403, 'no leading space', done)
     })
 
-    it('should error with type = "entity.verify.failed"', function (done) {
-      var app = createApp({ verify: function (req, res, buf) {
-        if (buf[0] === 0x20) throw new Error('no leading space')
-      } })
+    it('should error with type = "entity.verify.failed"', done => {
+      const app = createApp({
+        verify: function (req, res, buf) {
+          if (buf[0] === 0x20) throw new Error('no leading space')
+        }
+      })
 
       request(app)
         .post('/')
@@ -549,13 +555,15 @@ describe('express.urlencoded()', function () {
         .expect(403, 'entity.verify.failed', done)
     })
 
-    it('should allow custom codes', function (done) {
-      var app = createApp({ verify: function (req, res, buf) {
-        if (buf[0] !== 0x20) return
-        var err = new Error('no leading space')
-        err.status = 400
-        throw err
-      } })
+    it('should allow custom codes', done => {
+      const app = createApp({
+        verify: function (req, res, buf) {
+          if (buf[0] !== 0x20) return
+          const err = new Error('no leading space')
+          err.status = 400
+          throw err
+        }
+      })
 
       request(app)
         .post('/')
@@ -564,13 +572,15 @@ describe('express.urlencoded()', function () {
         .expect(400, 'no leading space', done)
     })
 
-    it('should allow custom type', function (done) {
-      var app = createApp({ verify: function (req, res, buf) {
-        if (buf[0] !== 0x20) return
-        var err = new Error('no leading space')
-        err.type = 'foo.bar'
-        throw err
-      } })
+    it('should allow custom type', done => {
+      const app = createApp({
+        verify: function (req, res, buf) {
+          if (buf[0] !== 0x20) return
+          const err = new Error('no leading space')
+          err.type = 'foo.bar'
+          throw err
+        }
+      })
 
       request(app)
         .post('/')
@@ -580,10 +590,12 @@ describe('express.urlencoded()', function () {
         .expect(403, 'foo.bar', done)
     })
 
-    it('should allow pass-through', function (done) {
-      var app = createApp({ verify: function (req, res, buf) {
-        if (buf[0] === 0x5b) throw new Error('no arrays')
-      } })
+    it('should allow pass-through', done => {
+      const app = createApp({
+        verify: function (req, res, buf) {
+          if (buf[0] === 0x5b) throw new Error('no arrays')
+        }
+      })
 
       request(app)
         .post('/')
@@ -592,32 +604,34 @@ describe('express.urlencoded()', function () {
         .expect(200, '{"user":"tobi"}', done)
     })
 
-    it('should 415 on unknown charset prior to verify', function (done) {
-      var app = createApp({ verify: function (req, res, buf) {
-        throw new Error('unexpected verify call')
-      } })
+    it('should 415 on unknown charset prior to verify', done => {
+      const app = createApp({
+        verify: function (req, res, buf) {
+          throw new Error('unexpected verify call')
+        }
+      })
 
-      var test = request(app).post('/')
+      const test = request(app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded; charset=x-bogus')
       test.write(Buffer.from('00000000', 'hex'))
       test.expect(415, 'unsupported charset "X-BOGUS"', done)
     })
   })
 
-  describe('charset', function () {
+  describe('charset', () => {
     before(function () {
       this.app = createApp()
     })
 
     it('should parse utf-8', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
       test.write(Buffer.from('6e616d653de8aeba', 'hex'))
       test.expect(200, '{"name":"论"}', done)
     })
 
     it('should parse when content-length != char length', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
       test.set('Content-Length', '7')
       test.write(Buffer.from('746573743dc3a5', 'hex'))
@@ -625,34 +639,34 @@ describe('express.urlencoded()', function () {
     })
 
     it('should default to utf-8', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(Buffer.from('6e616d653de8aeba', 'hex'))
       test.expect(200, '{"name":"论"}', done)
     })
 
     it('should fail on unknown charset', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded; charset=koi8-r')
       test.write(Buffer.from('6e616d653dcec5d4', 'hex'))
       test.expect(415, 'unsupported charset "KOI8-R"', done)
     })
   })
 
-  describe('encoding', function () {
+  describe('encoding', () => {
     before(function () {
       this.app = createApp({ limit: '10kb' })
     })
 
     it('should parse without encoding', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(Buffer.from('6e616d653de8aeba', 'hex'))
       test.expect(200, '{"name":"论"}', done)
     })
 
     it('should support identity encoding', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Encoding', 'identity')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(Buffer.from('6e616d653de8aeba', 'hex'))
@@ -660,7 +674,7 @@ describe('express.urlencoded()', function () {
     })
 
     it('should support gzip encoding', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Encoding', 'gzip')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(Buffer.from('1f8b080000000000000bcb4bcc4db57db16e170099a4bad608000000', 'hex'))
@@ -668,7 +682,7 @@ describe('express.urlencoded()', function () {
     })
 
     it('should support deflate encoding', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Encoding', 'deflate')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(Buffer.from('789ccb4bcc4db57db16e17001068042f', 'hex'))
@@ -676,7 +690,7 @@ describe('express.urlencoded()', function () {
     })
 
     it('should be case-insensitive', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Encoding', 'GZIP')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(Buffer.from('1f8b080000000000000bcb4bcc4db57db16e170099a4bad608000000', 'hex'))
@@ -684,7 +698,7 @@ describe('express.urlencoded()', function () {
     })
 
     it('should fail on unknown encoding', function (done) {
-      var test = request(this.app).post('/')
+      const test = request(this.app).post('/')
       test.set('Content-Encoding', 'nulls')
       test.set('Content-Type', 'application/x-www-form-urlencoded')
       test.write(Buffer.from('000000000000', 'hex'))
@@ -693,8 +707,8 @@ describe('express.urlencoded()', function () {
   })
 })
 
-function createManyParams (count) {
-  var str = ''
+function createManyParams(count) {
+  let str = ''
 
   if (count === 0) {
     return str
@@ -702,33 +716,33 @@ function createManyParams (count) {
 
   str += '0=0'
 
-  for (var i = 1; i < count; i++) {
-    var n = i.toString(36)
-    str += `&${  n  }=${  n}`
+  for (let i = 1; i < count; i++) {
+    const n = i.toString(36)
+    str += `&${n}=${n}`
   }
 
   return str
 }
 
-function createApp (options) {
-  var app = express()
+function createApp(options) {
+  const app = express()
 
   app.use(express.urlencoded(options))
 
-  app.use(function (err, req, res, next) {
+  app.use((err, req, res, next) => {
     res.status(err.status || 500)
     res.send(String(err[req.headers['x-error-property'] || 'message']))
   })
 
-  app.post('/', function (req, res) {
+  app.post('/', (req, res) => {
     res.json(req.body)
   })
 
   return app
 }
 
-function expectKeyCount (count) {
-  return function (res) {
+function expectKeyCount(count) {
+  return res => {
     assert.strictEqual(Object.keys(JSON.parse(res.text)).length, count)
   }
 }

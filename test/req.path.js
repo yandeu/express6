@@ -1,19 +1,16 @@
+const express = require('../'),
+  request = require('supertest')
 
-var express = require('../')
-  , request = require('supertest');
+describe('req', () => {
+  describe('.path', () => {
+    it('should return the parsed pathname', done => {
+      const app = express()
 
-describe('req', function(){
-  describe('.path', function(){
-    it('should return the parsed pathname', function(done){
-      var app = express();
+      app.use((req, res) => {
+        res.end(req.path)
+      })
 
-      app.use(function(req, res){
-        res.end(req.path);
-      });
-
-      request(app)
-      .get('/login?redirect=/post/1/comments')
-      .expect('/login', done);
+      request(app).get('/login?redirect=/post/1/comments').expect('/login', done)
     })
   })
 })

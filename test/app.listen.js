@@ -1,17 +1,16 @@
+const express = require('../')
 
-var express = require('../')
+describe('app.listen()', () => {
+  it('should wrap with an HTTP server', done => {
+    const app = express()
 
-describe('app.listen()', function(){
-  it('should wrap with an HTTP server', function(done){
-    var app = express();
+    app.get('/tobi', (req, res) => {
+      res.end('got tobi!')
+    })
 
-    app.get('/tobi', function(req, res){
-      res.end('got tobi!');
-    });
-
-    var server = app.listen(9999, function(){
-      server.close();
-      done();
-    });
+    const server = app.listen(9999, () => {
+      server.close()
+      done()
+    })
   })
 })
