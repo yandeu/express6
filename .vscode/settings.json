@@ -1,5 +1,8 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
+  "files.associations": {
+    ".nycrc": "json"
+  },
   "files.exclude": {
     "dev.js": true
   }

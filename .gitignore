@@ -1,4 +1,5 @@
+/.nyc_output
 /coverage
+/dev.js
 /lib
 /node_modules
-/dev.js

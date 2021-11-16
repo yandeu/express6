@@ -28,7 +28,7 @@ jobs:
         run: npm run build-cjs
 
       - name: Run Tests
-        run: npm run pretest && npm run test-ci && npm run posttest
+        run: npm run test-ci
 
       - name: Run Prettier
         run: npm run format
@@ -64,7 +64,7 @@ jobs:
         run: npm run build-cjs
 
       - name: Run Tests
-        run: npm run pretest && npm run test-ci && npm run posttest
+        run: npm run test-ci
 
       - name: Run Prettier
         run: npm run format
