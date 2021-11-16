@@ -43,10 +43,11 @@ class Express extends ExtensibleFunction<RequestHandler> {
   get!: GetSettings | RESTFunction
   post!: RESTFunction
   put!: RESTFunction
-  delete!: RESTFunction
   patch!: RESTFunction
-  options!: RESTFunction
+  delete!: RESTFunction
+  copy!: RESTFunction
   head!: RESTFunction
+  options!: RESTFunction
 
   constructor() {
     super((req, res, next) => {
