@@ -5,6 +5,15 @@
 import { get } from 'http'
 import { express, RequestHandler, Router } from './lib/express.js'
 import http from 'http'
+import { h, render, FC } from './lib/jsx.js'
+import { escapeHTML } from './lib/utils.js'
+
+// FC name always starts with an uppercase!
+const Bla: FC<{ name: string }> = props => {
+  return <div>{escapeHTML(props.name)}</div>
+}
+
+console.log(render(<Bla name="yan<nick" />))
 
 const port = 3000
 const app = express()

@@ -14,6 +14,9 @@ import proxyaddr from 'proxy-addr'
 import qs from 'qs'
 import querystring from 'querystring'
 
+import escapeHTML from 'escape-html'
+export { escapeHTML }
+
 /**
  * Create an ETag generator function, generating ETags with
  * the given options.

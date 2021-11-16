@@ -3,9 +3,14 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": ".",
+
+    "target": "ES2015",
+    "jsx": "react",
+    "jsxFactory": "h",
+
     "declaration": false,
     "sourceMap": false
   },
-  "include": ["dev.ts"],
+  "include": ["dev.tsx"],
   "exclude": ["node_modules", "**/*.spec.ts", "src/**/*"]
 }
