@@ -14,6 +14,7 @@
 'use strict'
 
 const ex = require('./lib/express')
+const bodyParser = require('body-parser')
 
 let express = () => {
   return ex.express()
@@ -30,9 +31,9 @@ express.response = ex.response
 express.static = ex.Static
 
 // bodyParser
-express.json = ex.json
-express.raw = ex.raw
-express.text = ex.text
-express.urlencoded = ex.urlencoded
+express.json = bodyParser.json
+express.raw = bodyParser.raw
+express.text = bodyParser.text
+express.urlencoded = bodyParser.urlencoded
 
 exports = module.exports = express

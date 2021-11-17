@@ -1,6 +1,8 @@
 import type { req } from './request.js'
 import type { res } from './response.js'
 
+export type { Route } from './router/route.js'
+
 export type Request = typeof req
 export type Response = typeof res
 

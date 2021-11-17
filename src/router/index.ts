@@ -14,7 +14,7 @@ import mixin from 'utils-merge'
 import _debug from 'debug'
 import { flatten } from 'array-flatten'
 import parseUrl from 'parseurl'
-import { RequestHandler } from '../types.js'
+import { RequestHandler, RESTFunction } from '../types.js'
 import { ExtensibleFunction } from '../utils.js'
 
 const debug = _debug('express:router')
@@ -41,6 +41,15 @@ class Router extends ExtensibleFunction<RequestHandler> {
   mergeParams: boolean
   caseSensitive: boolean
   strict: boolean
+
+  get!: RESTFunction
+  post!: RESTFunction
+  put!: RESTFunction
+  patch!: RESTFunction
+  delete!: RESTFunction
+  copy!: RESTFunction
+  head!: RESTFunction
+  options!: RESTFunction
 
   constructor(options: RouterOptions = {}) {
     super((req, res, next) => {

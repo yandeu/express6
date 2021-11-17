@@ -11,11 +11,9 @@ import contentDisposition from 'content-disposition'
 import encodeUrl from 'encodeurl'
 import escapeHtml from 'escape-html'
 import { ServerResponse } from 'http'
-import pathIsAbsolute from 'path-is-absolute'
 import onFinished from 'on-finished'
-import { extname, resolve } from 'path'
+import { extname, resolve, isAbsolute } from 'path'
 import statuses from 'statuses'
-import merge from 'utils-merge'
 import { sign } from 'cookie-signature'
 import { normalizeType, normalizeTypes, setCharset } from './utils.js'
 import cookie from 'cookie'
@@ -321,7 +319,7 @@ class Response extends ServerResponse {
       opts = {}
     }
 
-    if (!opts.root && !pathIsAbsolute(path)) {
+    if (!opts.root && !isAbsolute(path)) {
       throw new TypeError('path must be absolute or specify root to res.sendFile')
     }
 

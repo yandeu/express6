@@ -8,7 +8,6 @@
  */
 
 /** Module dependencies. */
-import bodyParser from 'body-parser'
 import { Express } from './application.js'
 import { Route } from './router/route.js'
 import { Router } from './router/index.js'
@@ -50,8 +49,6 @@ export { Router }
 export * from './types.js'
 
 /** Expose middleware */
-const { json, raw, text, urlencoded } = bodyParser
-export { json, raw, text, urlencoded }
 import _static from 'serve-static'
 export { _static as Static }
 
