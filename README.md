@@ -4,11 +4,15 @@ Modern, fast, unopinionated, minimalist web framework for [node](http://nodejs.o
 
 [![Github Workflow](https://img.shields.io/github/workflow/status/yandeu/express6/CI/main?label=build&logo=github&style=flat-square)](https://github.com/yandeu/express6/actions?query=workflow%3ACI)
 [![Github Workflow](https://img.shields.io/github/workflow/status/yandeu/express6/CodeQL/main?label=CodeQL&logo=github&style=flat-square)](https://github.com/yandeu/express6/actions?query=workflow%3ACodeQL)
+[![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/yandeu/express6?label=snyk%20vulnerabilities&logo=snyk&style=flat-square)](https://github.com/yandeu/express6/actions/workflows/snyk.yml)
 ![Node version](https://img.shields.io/node/v/@geckos.io/server.svg?style=flat-square)
 [![Codecov](https://img.shields.io/codecov/c/github/yandeu/express6?logo=codecov&style=flat-square)](https://codecov.io/gh/yandeu/express6)
+[![Sponsors](https://img.shields.io/github/sponsors/yandeu?style=flat-square)](https://github.com/sponsors/yandeu)
 [![CodeStyle Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://prettier.io/)
 
 ```ts
+// npm install express6
+
 import { express } from 'express'
 const app = express()
 
