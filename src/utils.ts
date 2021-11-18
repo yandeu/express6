@@ -14,6 +14,11 @@ import proxyaddr from 'proxy-addr'
 import qs from 'qs'
 import querystring from 'querystring'
 
+/** Split and trim a string */
+const splitAndTrim = (str: string, splitter: string): string[] => {
+  return str.split(splitter).map(v => v.trim())
+}
+
 /**
  * Create an ETag generator function, generating ETags with
  * the given options.
@@ -107,12 +112,12 @@ export const normalizeTypes = types => {
  * @api private
  */
 
-const acceptParams = (str, index) => {
-  const parts = str.split(/ *; */)
+const acceptParams = (str: string, index?: number) => {
+  const parts = splitAndTrim(str, ';')
   const ret = { value: parts[0], quality: 1, params: {}, originalIndex: index }
 
   for (let i = 1; i < parts.length; ++i) {
-    const pms = parts[i].split(/ *= */)
+    const pms = splitAndTrim(parts[i], '=')
     if ('q' === pms[0]) {
       ret.quality = parseFloat(pms[1])
     } else {
@@ -214,8 +219,7 @@ export const compileTrust = val => {
 
   if (typeof val === 'string') {
     // Support comma-separated values
-    val = val.split(',')
-    val = val.map(v => v.trim())
+    val = splitAndTrim(val, ',')
   }
 
   return proxyaddr.compile(val || [])
