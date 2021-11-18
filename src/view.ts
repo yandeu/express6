@@ -106,14 +106,14 @@ export class View {
     debug('render "%s"', this.path)
 
     // render, normalizing sync callbacks
+    const ctx: View = this
     this.engine(this.path, options, function onRender() {
       if (!sync) {
-        return callback.apply(this, arguments)
+        return callback.apply(ctx, arguments)
       }
 
       // copy arguments
       const args = new Array(arguments.length)
-      const ctx = this
 
       for (let i = 0; i < arguments.length; i++) {
         args[i] = arguments[i]

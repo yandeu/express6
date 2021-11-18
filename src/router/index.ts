@@ -9,13 +9,17 @@
 
 import { Route } from './route.js'
 import { Layer } from './layer.js'
-import methods from 'methods'
+import _methods from 'methods'
 import mixin from 'utils-merge'
 import _debug from 'debug'
 import { flatten } from 'array-flatten'
 import parseUrl from 'parseurl'
-import { RequestHandler, RESTFunction } from '../types.js'
+import { Request, Response, NextFunction, RequestHandler, RESTFunction } from '../types.js'
 import { ExtensibleFunction } from '../utils.js'
+
+// extends methods array with 'all
+type Methods = typeof _methods[0] | 'all'
+const methods: Methods[] = [..._methods, 'all']
 
 const debug = _debug('express:router')
 const objectRegExp = /^\[object (\S+)\]$/
@@ -261,7 +265,7 @@ class Router extends ExtensibleFunction<RequestHandler> {
       })
     }
 
-    function trim_prefix(layer, layerError, layerPath, path) {
+    function trim_prefix(layer: Layer, layerError, layerPath, path: string) {
       if (layerPath.length !== 0) {
         // Validate path breaks on a path separator
         const c = path[layerPath.length]
@@ -295,7 +299,7 @@ class Router extends ExtensibleFunction<RequestHandler> {
   }
 
   /** Process any parameters for the layer. */
-  private process_params(layer, called, req, res, done) {
+  private process_params(layer: Layer, called, req: Request, res: Response, done) {
     const params = this.params
 
     // captured parameters from the layer, keys and values
@@ -391,11 +395,8 @@ class Router extends ExtensibleFunction<RequestHandler> {
    * to the handler function. The main effect of this feature is that mounted
    * handlers can operate without any code changes regardless of the "prefix"
    * pathname.
-   *
-   * @public
    */
-
-  use(fn) {
+  public use(fn: any) {
     let offset = 0
     let path = '/'
 
@@ -456,13 +457,8 @@ class Router extends ExtensibleFunction<RequestHandler> {
    *
    * See the Route api documentation for details on adding handlers
    * and middleware to routes.
-   *
-   * @param {String} path
-   * @return {Route}
-   * @public
    */
-
-  route(path) {
+  public route(path: string): Route {
     const route = new Route(path)
 
     const layer = new Layer(
@@ -484,8 +480,9 @@ class Router extends ExtensibleFunction<RequestHandler> {
 }
 
 // create Router#VERB functions
-methods.concat('all').forEach(function (method) {
-  Router.prototype[method] = function (path) {
+methods.concat('all').forEach(function (method: Methods) {
+  // @ts-ignore
+  Router.prototype[method] = function (path: string) {
     const route = this.route(path)
     // eslint-disable-next-line prefer-spread
     route[method].apply(route, slice.call(arguments, 1))
@@ -494,7 +491,7 @@ methods.concat('all').forEach(function (method) {
 })
 
 // append methods to a list of methods
-function appendMethods(list, addition) {
+function appendMethods(list: any, addition: any) {
   for (let i = 0; i < addition.length; i++) {
     const method = addition[i]
     if (list.indexOf(method) === -1) {
@@ -504,7 +501,7 @@ function appendMethods(list, addition) {
 }
 
 // get pathname of request
-function getPathname(req) {
+function getPathname(req: Request) {
   try {
     return parseUrl(req)?.pathname
   } catch (err) {
@@ -513,7 +510,7 @@ function getPathname(req) {
 }
 
 // Get get protocol + host for a URL
-function getProtohost(url) {
+function getProtohost(url: string): string | undefined {
   if (typeof url !== 'string' || url.length === 0 || url[0] === '/') {
     return undefined
   }
@@ -526,7 +523,7 @@ function getProtohost(url) {
 }
 
 // get type for error message
-function gettype(obj) {
+function gettype(obj: object) {
   const type = typeof obj
 
   if (type !== 'object') {
@@ -537,15 +534,8 @@ function gettype(obj) {
   return toString.call(obj).replace(objectRegExp, '$1')
 }
 
-/**
- * Match path to a layer.
- *
- * @param {Layer} layer
- * @param {string} path
- * @private
- */
-
-function matchLayer(layer, path) {
+/** Match path to a layer. */
+function matchLayer(layer: Layer, path: string) {
   try {
     return layer.match(path)
   } catch (err) {
@@ -554,7 +544,7 @@ function matchLayer(layer, path) {
 }
 
 // merge params with parent params
-function mergeParams(params, parent) {
+function mergeParams(params: { [key: string]: string }, parent: object) {
   if (typeof parent !== 'object' || !parent) {
     return params
   }
@@ -593,7 +583,7 @@ function mergeParams(params, parent) {
 }
 
 // restore obj props after function
-function restore(fn?: any, obj?: any) {
+function restore(this: void, fn?: any, obj?: any) {
   const props = new Array(arguments.length - 2)
   const vals = new Array(arguments.length - 2)
 
@@ -602,18 +592,19 @@ function restore(fn?: any, obj?: any) {
     vals[i] = obj[props[i]]
   }
 
+  const _this = this
   return function () {
     // restore vals
     for (let i = 0; i < props.length; i++) {
       obj[props[i]] = vals[i]
     }
 
-    return fn.apply(this, arguments)
+    return fn.apply(_this, arguments)
   }
 }
 
 // send an OPTIONS response
-function sendOptionsResponse(res, options, next) {
+function sendOptionsResponse(res: Response, options: any[], next: NextFunction) {
   try {
     const body = options.join(',')
     res.set('Allow', body)
@@ -624,7 +615,8 @@ function sendOptionsResponse(res, options, next) {
 }
 
 // wrap a function
-function wrap(old, fn) {
+function wrap(this: void, old: any, fn: Function) {
+  const _this = this
   return function proxy() {
     const args = new Array(arguments.length + 1)
 
@@ -633,7 +625,7 @@ function wrap(old, fn) {
       args[i + 1] = arguments[i]
     }
 
-    fn.apply(this, args)
+    fn.apply(_this, args)
   }
 }
 

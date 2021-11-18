@@ -7,6 +7,7 @@
  * MIT Licensed
  */
 
+// @ts-ignore
 import pathRegexp from 'path-to-regexp'
 import _debug from 'debug'
 import type { Request, Response, NextFunction } from '../types'
@@ -16,7 +17,7 @@ const debug = _debug('express:router:layer')
 const hasOwnProperty = Object.prototype.hasOwnProperty
 
 // handle UnhandledPromiseRejection
-const isPromise = val =>
+const isPromise = (val: Promise<any>) =>
   val && typeof val === 'object' && typeof val.then === 'function' && typeof val.catch === 'function'
 
 interface ExtendedRegExp extends RegExp {
@@ -56,7 +57,7 @@ export class Layer {
   }
 
   /** Handle the error for the layer. */
-  private handle_error(error: any, req: Request, res: Response, next: NextFunction) {
+  public handle_error(error: any, req: Request, res: Response, next: NextFunction) {
     const fn = this.handle
 
     if (fn.length !== 4) {
@@ -81,7 +82,7 @@ export class Layer {
   }
 
   /** Handle the request for the layer. */
-  private handle_request(req: Request, res: Response, next: NextFunction) {
+  public handle_request(req: Request, res: Response, next: NextFunction) {
     const fn = this.handle
 
     if (fn.length > 3) {
@@ -109,7 +110,7 @@ export class Layer {
    * Check if this route matches `path`, if so
    * populate `.params`.
    */
-  private match(path: string): boolean {
+  public match(path: string): boolean {
     let match: RegExpExecArray | null | undefined
 
     if (path != null) {

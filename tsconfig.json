@@ -12,11 +12,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
 
-    "allowJs": true,
     "declaration": true,
     "sourceMap": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false
+    "noImplicitAny": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]

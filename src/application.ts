@@ -90,7 +90,7 @@ class Express extends ExtensibleFunction<RequestHandler> {
 
     debug('booting in %s mode', env)
 
-    this.on('mount', function onmount(parent) {
+    this.on('mount', function onmount(this: Express, parent) {
       // inherit trust proxy
       if (this.settings[trustProxyDefaultSymbol] === true && typeof parent.settings['trust proxy fn'] === 'function') {
         delete this.settings['trust proxy']
@@ -229,6 +229,7 @@ class Express extends ExtensibleFunction<RequestHandler> {
     // setup router
     const router = this.router
 
+    const _this = this
     fns.forEach(function (fn) {
       // non-express app
       if (!fn || !fn.handle || !fn.set) {
@@ -237,7 +238,7 @@ class Express extends ExtensibleFunction<RequestHandler> {
 
       debug('.use app under %s', path)
       fn.mountpath = path
-      fn.parent = this
+      fn.parent = _this
 
       // restore .app property on req and res
       router.use(path, function mounted_app(req, res, next) {
@@ -250,7 +251,7 @@ class Express extends ExtensibleFunction<RequestHandler> {
       })
 
       // mounted an app
-      fn.emit('mount', this)
+      fn.emit('mount', _this)
     }, this)
 
     return this
@@ -567,7 +568,7 @@ methods.forEach(function (method: string) {
  * @param {Error} err
  * @private
  */
-function logerror(err) {
+function logerror(this: Express, err) {
   /* istanbul ignore next */
   if (this.get('env') !== 'test') console.error(err.stack || err.toString())
 }
