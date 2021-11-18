@@ -1,4 +1,6 @@
-[![Express6 Logo](readme/logo.png)](http://expressjs.com/)
+<div align="center">
+
+<a href="http://expressjs.com/"><img alt="express6 logo" width="480" src="readme/logo.jpg"></a>
 
 Modern, fast, unopinionated, minimalist web framework for [node](http://nodejs.org).
 
@@ -9,6 +11,10 @@ Modern, fast, unopinionated, minimalist web framework for [node](http://nodejs.o
 [![Codecov](https://img.shields.io/codecov/c/github/yandeu/express6?logo=codecov&style=flat-square)](https://codecov.io/gh/yandeu/express6)
 [![Sponsors](https://img.shields.io/github/sponsors/yandeu?style=flat-square)](https://github.com/sponsors/yandeu)
 [![CodeStyle Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://prettier.io/)
+
+</div>
+
+---
 
 ```ts
 // npm install express6
