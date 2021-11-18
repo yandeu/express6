@@ -6,7 +6,6 @@
  * MIT Licensed
  */
 
-import { Buffer } from 'safe-buffer'
 import contentType from 'content-type'
 import { mime } from 'send'
 import _etag from 'etag'

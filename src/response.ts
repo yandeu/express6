@@ -6,7 +6,6 @@
  * MIT Licensed
  */
 
-import { Buffer } from 'safe-buffer'
 import contentDisposition from 'content-disposition'
 import encodeUrl from 'encodeurl'
 import escapeHtml from 'escape-html'
