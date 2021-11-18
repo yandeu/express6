@@ -95,3 +95,14 @@ Yes, same as [Express v5](https://expressjs.com/en/guide/migrating-5.html).
 ## Everything Else?
 
 Same as [expressjs](https://github.com/expressjs/express).
+
+---
+
+## My Projects
+
+Interested in some of my other projects?
+
+|                                     [`nanojsx`](http://nanojsx.io)                                     |                                         [`enable3d`](https://enable3d.io)                                          |                                     [`geckos.io`](http://geckos.io)                                     |        [`five-server`](https://marketplace.visualstudio.com/items?itemName=yandeu.five-server)        |
+| :----------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: |
+| <img width="120" src="https://raw.githubusercontent.com/nanojsx/nano/master/readme/nano-jsx-logo.svg"> | <img width="120" src="https://raw.githubusercontent.com/enable3d/enable3d/master/readme/enable3d-logo-square.png"> | <img width="120" src="https://raw.githubusercontent.com/geckosio/geckos.io/master/readme/logo-256.png"> | <img width="120" src="https://raw.githubusercontent.com/yandeu/five-server-vscode/main/img/icon.png"> |
+
