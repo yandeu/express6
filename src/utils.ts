@@ -13,6 +13,14 @@ import proxyaddr from 'proxy-addr'
 import qs from 'qs'
 import querystring from 'querystring'
 
+// TODO(yandeu): Improve this
+interface TMP {
+  originalIndex?: number
+  params: { [key: string]: string }
+  quality?: number
+  value: string
+}
+
 /** Split and trim a string */
 const splitAndTrim = (str: string, splitter: string): string[] => {
   return str.split(splitter).map(v => v.trim())
@@ -21,27 +29,16 @@ const splitAndTrim = (str: string, splitter: string): string[] => {
 /**
  * Create an ETag generator function, generating ETags with
  * the given options.
- *
- * @param {object} options
- * @return {function}
- * @private
  */
-
-const createETagGenerator = options => {
-  return (body, encoding) => {
+const createETagGenerator = (options: Object): Function => {
+  return (body: string, encoding: BufferEncoding) => {
     const buf = !Buffer.isBuffer(body) ? Buffer.from(body, encoding) : body
     return _etag(buf, options)
   }
 }
 
-/**
- * Parse an extended query string with qs.
- *
- * @return {Object}
- * @private
- */
-
-const parseExtendedQueryString = str => {
+/** Parse an extended query string with qs. */
+const parseExtendedQueryString = (str: string) => {
   return qs.parse(str, {
     allowPrototypes: true
   })
@@ -69,32 +66,16 @@ export const etag = createETagGenerator({ weak: false })
 
 export const wetag = createETagGenerator({ weak: true })
 
-/**
- * Normalize the given `type`, for example "html" becomes "text/html".
- *
- * @param {String} type
- * @return {Object}
- * @api private
- */
-
-export const normalizeType = type => {
-  // @ts-ignore
+/** Normalize the given `type`, for example "html" becomes "text/html". */
+export const normalizeType = (type: string) => {
   return ~type.indexOf('/') ? acceptParams(type) : { value: mime.lookup(type), params: {} }
 }
 
-/**
- * Normalize `types`, for example "html" becomes "text/html".
- *
- * @param {Array} types
- * @return {Array}
- * @api private
- */
-
-export const normalizeTypes = types => {
-  const ret: any[] = []
+/** Normalize `types`, for example "html" becomes "text/html". */
+export const normalizeTypes = (types: string[]): TMP[] => {
+  const ret: TMP[] = []
 
   for (let i = 0; i < types.length; ++i) {
-    // @ts-ignore
     ret.push(normalizeType(types[i]))
   }
 
@@ -111,9 +92,9 @@ export const normalizeTypes = types => {
  * @api private
  */
 
-const acceptParams = (str: string, index?: number) => {
+const acceptParams = (str: string, index?: number): TMP => {
   const parts = splitAndTrim(str, ';')
-  const ret = { value: parts[0], quality: 1, params: {}, originalIndex: index }
+  const ret: TMP = { value: parts[0], quality: 1, params: {}, originalIndex: index }
 
   for (let i = 1; i < parts.length; ++i) {
     const pms = splitAndTrim(parts[i], '=')
@@ -127,16 +108,9 @@ const acceptParams = (str: string, index?: number) => {
   return ret
 }
 
-/**
- * Compile "etag" value to function.
- *
- * @param  {Boolean|String|Function} val
- * @return {Function}
- * @api private
- */
-
-export const compileETag = val => {
-  let fn
+/** Compile "etag" value to function. */
+export const compileETag = (val: boolean | string | Function): Function => {
+  let fn!: Function
 
   if (typeof val === 'function') {
     return val
@@ -159,16 +133,10 @@ export const compileETag = val => {
   return fn
 }
 
-/**
- * Compile "query parser" value to function.
- *
- * @param  {String|Function} val
- * @return {Function}
- * @api private
- */
+/** Compile "query parser" value to function. */
 
-export const compileQueryParser = val => {
-  let fn
+export const compileQueryParser = (val: boolean | string | Function): Function => {
+  let fn!: Function
 
   if (typeof val === 'function') {
     return val
@@ -191,15 +159,8 @@ export const compileQueryParser = val => {
   return fn
 }
 
-/**
- * Compile "proxy trust" value to function.
- *
- * @param  {Boolean|String|Number|Array|Function} val
- * @return {Function}
- * @api private
- */
-
-export const compileTrust = val => {
+/** Compile "proxy trust" value to function. */
+export const compileTrust = (val: string | string[] | boolean | Function): Function => {
   if (typeof val === 'function') return val
 
   if (val === true) {
@@ -211,8 +172,8 @@ export const compileTrust = val => {
 
   if (typeof val === 'number') {
     // Support trusting hop count
-    return (a, i) => {
-      return i < val
+    return (_a: any, i: number) => {
+      return i < (val as unknown as number)
     }
   }
 
@@ -233,7 +194,7 @@ export const compileTrust = val => {
  * @api private
  */
 
-export const setCharset = (type, charset) => {
+export const setCharset = (type: string, charset: string): string => {
   if (!type || !charset) {
     return type
   }

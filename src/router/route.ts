@@ -11,6 +11,7 @@ import { flatten } from 'array-flatten'
 import { Layer } from './layer.js'
 import methods from 'methods'
 import _debug from 'debug'
+import { Request, Response, NextFunction } from '../types.js'
 
 const debug = _debug('express:router:route')
 const slice = Array.prototype.slice
@@ -28,7 +29,7 @@ export class Route {
   stack: any[] = []
   methods: any = {}
 
-  constructor(path) {
+  constructor(path: string) {
     this.path = path
     this.stack = []
 
@@ -38,12 +39,8 @@ export class Route {
     this.methods = {}
   }
 
-  /**
-   * Determine if the route handles a given method.
-   * @private
-   */
-
-  _handles_method(method) {
+  /** Determine if the route handles a given method. */
+  private _handles_method(method: string) {
     if (this.methods._all) {
       return true
     }
@@ -78,28 +75,26 @@ export class Route {
     return methods
   }
 
-  /**
-   * dispatch req, res into this route
-   * @private
-   */
-
-  dispatch(req, res, done) {
+  /** dispatch req, res into this route */
+  public dispatch(req: Request, res: Response, done: NextFunction): any {
     let idx = 0
     const stack = this.stack
     if (stack.length === 0) {
       return done()
     }
 
+    // @ts-ignore
     let method = req.method.toLowerCase()
     if (method === 'head' && !this.methods['head']) {
       method = 'get'
     }
 
+    // @ts-ignore
     req.route = this
 
     next()
 
-    function next(err?: any) {
+    function next(err?: any): Function | void {
       // signal to exit route
       if (err && err === 'route') {
         return done()
@@ -178,7 +173,8 @@ export class Route {
   }
 }
 
-methods.forEach(function (method) {
+methods.forEach(function (method: string) {
+  // @ts-ignore
   Route.prototype[method] = function () {
     const handles = flatten(slice.call(arguments))
 

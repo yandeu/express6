@@ -547,8 +547,8 @@ class Express extends ExtensibleFunction<RequestHandler> {
 }
 
 /** Delegate `.VERB(...)` calls to `router.VERB(...)`. */
-methods.forEach(function (method) {
-  Express.prototype[method] = function (...path) {
+methods.forEach(function (method: string) {
+  Express.prototype[method] = function (...path: string[]) {
     if (method === 'get' && arguments.length === 1) {
       // app.get(setting)
       return this.set(path[0])

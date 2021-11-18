@@ -34,7 +34,7 @@ export class View {
   name: string
   root: string
   engine: any
-  path: string
+  path: string | undefined
 
   constructor(name: string, options: ViewOptions) {
     this.defaultEngine = options.defaultEngine
@@ -78,8 +78,8 @@ export class View {
   }
 
   /** Lookup view by the given `name` */
-  private lookup(name: string): string {
-    let path
+  private lookup(name: string): string | undefined {
+    let path: string | undefined
     const roots: string[] = ([] as string[]).concat(this.root)
 
     debug('lookup "%s"', name)

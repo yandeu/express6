@@ -472,6 +472,7 @@ class Router extends ExtensibleFunction<RequestHandler> {
         strict: this.strict,
         end: true
       },
+      // @ts-ignore
       route.dispatch.bind(route)
     )
 

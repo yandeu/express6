@@ -476,7 +476,7 @@ class Response extends ServerResponse {
 
     const fn = obj.default
     if (fn) delete obj.default
-    const keys = Object.keys(obj)
+    const keys: string[] = Object.keys(obj)
 
     const key = keys.length > 0 ? req.accepts(keys) : false
 
@@ -556,6 +556,7 @@ class Response extends ServerResponse {
           throw new TypeError('Content-Type cannot be set to an Array')
         }
         if (!charsetRegExp.test(value)) {
+          // @ts-ignore
           const charset = mime.charsets.lookup(value.split(';')[0])
           if (charset) value += `; charset=${charset.toLowerCase()}`
         }
@@ -581,6 +582,7 @@ class Response extends ServerResponse {
           throw new TypeError('Content-Type cannot be set to an Array')
         }
         if (!charsetRegExp.test(value)) {
+          // @ts-ignore
           const charset = mime.charsets.lookup(value.split(';')[0])
           if (charset) value += `; charset=${charset.toLowerCase()}`
         }

@@ -39,7 +39,7 @@ export class Layer {
   regexp!: ExtendedRegExp
   route: Route | undefined
 
-  constructor(path, options, fn) {
+  constructor(path: string, options: Object, fn: Handler) {
     debug('new %o', path)
     const opts = options || {}
 
@@ -51,6 +51,7 @@ export class Layer {
 
     // set fast path flags
     this.regexp.fast_star = path === '*'
+    // @ts-ignore
     this.regexp.fast_slash = path === '/' && opts.end === false
   }
 
