@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 const express = require('../')
 const request = require('supertest')
 

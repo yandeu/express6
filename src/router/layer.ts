@@ -7,11 +7,10 @@
  * MIT Licensed
  */
 
-// @ts-ignore
-import pathRegexp from 'path-to-regexp'
-import _debug from 'debug'
-import type { Request, Response, NextFunction } from '../types'
+import type { NextFunction, Request, Response } from '../types'
 import type { Route } from '../types'
+import _debug from 'debug'
+import pathRegexp from 'path-to-regexp'
 
 const debug = _debug('express:router:layer')
 const hasOwnProperty = Object.prototype.hasOwnProperty

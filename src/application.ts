@@ -7,19 +7,19 @@
  * MIT Licensed
  */
 
-import finalhandler from 'finalhandler'
-import { Router } from './router/index.js'
-import methods from 'methods'
-import _debug from 'debug'
-import { View } from './view.js'
-import http from 'http'
+import type { GetSettings, RESTFunction, Request, RequestHandler, Response } from './types.js'
 import { applyMixins, compileETag, compileQueryParser, compileTrust } from './utils.js'
-import { flatten } from 'array-flatten'
-import merge from 'utils-merge'
-import { resolve } from 'path'
 import { EventEmitter } from 'events'
-import type { Request, Response, RequestHandler, GetSettings, RESTFunction } from './types.js'
 import { ExtensibleFunction } from './utils.js'
+import { Router } from './router/index.js'
+import { View } from './view.js'
+import _debug from 'debug'
+import finalhandler from 'finalhandler'
+import { flatten } from 'array-flatten'
+import http from 'http'
+import merge from 'utils-merge'
+import methods from 'methods'
+import { resolve } from 'path'
 
 const debug = _debug('express:application')
 const slice = Array.prototype.slice

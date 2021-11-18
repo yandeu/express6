@@ -7,14 +7,14 @@
  * MIT Licensed
  */
 
-import accepts from 'accepts'
-import { isIP } from 'net'
-import typeis from 'type-is'
-import { IncomingMessage } from 'http'
-import fresh from 'fresh'
 import parseRange, { Ranges, Result } from 'range-parser'
+import { IncomingMessage } from 'http'
+import accepts from 'accepts'
+import fresh from 'fresh'
+import { isIP } from 'net'
 import parse from 'parseurl'
 import proxyaddr from 'proxy-addr'
+import typeis from 'type-is'
 
 class Request extends IncomingMessage {
   app: any

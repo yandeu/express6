@@ -7,11 +7,11 @@
  * MIT Licensed
  */
 
-import { flatten } from 'array-flatten'
+import { NextFunction, Request, Response } from '../types.js'
 import { Layer } from './layer.js'
-import methods from 'methods'
 import _debug from 'debug'
-import { Request, Response, NextFunction } from '../types.js'
+import { flatten } from 'array-flatten'
+import methods from 'methods'
 
 const debug = _debug('express:router:route')
 const slice = Array.prototype.slice

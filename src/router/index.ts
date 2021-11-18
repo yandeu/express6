@@ -7,15 +7,15 @@
  * MIT Licensed
  */
 
-import { Route } from './route.js'
-import { Layer } from './layer.js'
-import _methods from 'methods'
-import mixin from 'utils-merge'
-import _debug from 'debug'
-import { flatten } from 'array-flatten'
-import parseUrl from 'parseurl'
-import { Request, Response, NextFunction, RequestHandler, RESTFunction } from '../types.js'
+import { NextFunction, RESTFunction, Request, RequestHandler, Response } from '../types.js'
 import { ExtensibleFunction } from '../utils.js'
+import { Layer } from './layer.js'
+import { Route } from './route.js'
+import _debug from 'debug'
+import _methods from 'methods'
+import { flatten } from 'array-flatten'
+import mixin from 'utils-merge'
+import parseUrl from 'parseurl'
 
 // extends methods array with 'all
 type Methods = typeof _methods[0] | 'all'

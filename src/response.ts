@@ -6,20 +6,20 @@
  * MIT Licensed
  */
 
+import { extname, isAbsolute, resolve } from 'path'
+import { normalizeType, normalizeTypes, setCharset } from './utils.js'
+import send, { mime } from 'send'
+import type { Express } from './application.js'
+import { Request } from './types.js'
+import { ServerResponse } from 'http'
 import contentDisposition from 'content-disposition'
+import cookie from 'cookie'
 import encodeUrl from 'encodeurl'
 import escapeHtml from 'escape-html'
-import { ServerResponse } from 'http'
 import onFinished from 'on-finished'
-import { extname, resolve, isAbsolute } from 'path'
-import statuses from 'statuses'
 import { sign } from 'cookie-signature'
-import { normalizeType, normalizeTypes, setCharset } from './utils.js'
-import cookie from 'cookie'
-import send, { mime } from 'send'
+import statuses from 'statuses'
 import vary from 'vary'
-import { Request } from './types.js'
-import type { Express } from './application.js'
 
 const charsetRegExp = /;\s*charset\s*=/
 

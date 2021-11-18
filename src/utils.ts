@@ -6,9 +6,9 @@
  * MIT Licensed
  */
 
+import _etag from 'etag'
 import contentType from 'content-type'
 import { mime } from 'send'
-import _etag from 'etag'
 import proxyaddr from 'proxy-addr'
 import qs from 'qs'
 import querystring from 'querystring'

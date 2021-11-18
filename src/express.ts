@@ -11,6 +11,7 @@
 import { Express } from './application.js'
 import { Route } from './router/route.js'
 import { Router } from './router/index.js'
+import _static from 'serve-static'
 import { req } from './request.js'
 import { res } from './response.js'
 
@@ -49,7 +50,6 @@ export { Router }
 export * from './types.js'
 
 /** Expose middleware */
-import _static from 'serve-static'
 export { _static as Static }
 
 /**

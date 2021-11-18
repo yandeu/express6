@@ -7,8 +7,8 @@
  * MIT Licensed
  */
 
-import d from 'debug'
 import { basename, dirname, extname, join, resolve } from 'path'
+import d from 'debug'
 import fs from 'fs'
 
 const debug = d('express:view')
