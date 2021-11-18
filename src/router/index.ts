@@ -158,14 +158,14 @@ class Router extends ExtensibleFunction<RequestHandler> {
 
       // remove added slash
       if (slashAdded) {
-        req.url = req.url.substr(1)
+        req.url = req.url.substring(1)
         slashAdded = false
       }
 
       // restore altered req.url
       if (removed.length !== 0) {
         req.baseUrl = parentUrl
-        req.url = protohost + removed + req.url.substr(protohost.length)
+        req.url = protohost + removed + req.url.substring(protohost.length)
         removed = ''
       }
 
@@ -271,7 +271,7 @@ class Router extends ExtensibleFunction<RequestHandler> {
         // middleware (.use stuff) needs to have the path stripped
         debug('trim prefix (%s) from url %s', layerPath, req.url)
         removed = layerPath
-        req.url = protohost + req.url.substr(protohost.length + removed.length)
+        req.url = protohost + req.url.substring(protohost.length + removed.length)
 
         // Ensure leading slash
         if (!protohost && req.url[0] !== '/') {
@@ -520,9 +520,9 @@ function getProtohost(url) {
 
   const searchIndex = url.indexOf('?')
   const pathLength = searchIndex !== -1 ? searchIndex : url.length
-  const fqdnIndex = url.substr(0, pathLength).indexOf('://')
+  const fqdnIndex = url.substring(0, pathLength).indexOf('://')
 
-  return fqdnIndex !== -1 ? url.substr(0, url.indexOf('/', 3 + fqdnIndex)) : undefined
+  return fqdnIndex !== -1 ? url.substring(0, url.indexOf('/', 3 + fqdnIndex)) : undefined
 }
 
 // get type for error message

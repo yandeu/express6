@@ -57,7 +57,7 @@ export class View {
 
     if (!options.engines[this.ext]) {
       // load engine
-      const mod = this.ext.substr(1)
+      const mod = this.ext.substring(1)
       debug('require "%s"', mod)
 
       // default engine export
