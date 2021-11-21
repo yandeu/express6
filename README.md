@@ -19,7 +19,7 @@ Modern, fast, unopinionated, minimalist web framework for [node](http://nodejs.o
 ```ts
 // npm install express6
 
-import { express } from 'express'
+import { express } from 'express6'
 const app = express()
 
 app.get('/', (req, res) => {
