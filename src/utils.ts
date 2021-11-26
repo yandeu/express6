@@ -21,6 +21,20 @@ interface TMP {
   value: string
 }
 
+/**
+ * @copyright   Copyright (c) 2013-2017 Jared Hanson (https://github.com/jaredhanson)
+ * @license     {@link https://github.com/jaredhanson/utils-merge/blob/master/LICENSE MIT}
+ * @description replaces utils-merge (https://www.npmjs.com/package/utils-merge)
+ */
+export const merge = (a: object, b: object): object => {
+  if (a && b) {
+    for (var key in b) {
+      a[key] = b[key]
+    }
+  }
+  return a
+}
+
 /** Split and trim a string */
 const splitAndTrim = (str: string, splitter: string): string[] => {
   return str.split(splitter).map(v => v.trim())

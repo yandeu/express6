@@ -7,17 +7,16 @@
  * MIT Licensed
  */
 
+import { ExtensibleFunction, merge } from './utils.js'
 import type { GetSettings, RESTFunction, Request, RequestHandler, Response } from './types.js'
 import { applyMixins, compileETag, compileQueryParser, compileTrust } from './utils.js'
 import { EventEmitter } from 'events'
-import { ExtensibleFunction } from './utils.js'
 import { Router } from './router/index.js'
 import { View } from './view.js'
 import _debug from 'debug'
 import finalhandler from 'finalhandler'
 import { flatten } from 'array-flatten'
 import http from 'http'
-import merge from 'utils-merge'
 import methods from 'methods'
 import { resolve } from 'path'
 

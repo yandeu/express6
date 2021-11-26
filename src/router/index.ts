@@ -7,14 +7,13 @@
  * MIT Licensed
  */
 
+import { ExtensibleFunction, merge as mixin } from '../utils.js'
 import { NextFunction, RESTFunction, Request, RequestHandler, Response } from '../types.js'
-import { ExtensibleFunction } from '../utils.js'
 import { Layer } from './layer.js'
 import { Route } from './route.js'
 import _debug from 'debug'
 import _methods from 'methods'
 import { flatten } from 'array-flatten'
-import mixin from 'utils-merge'
 import parseUrl from 'parseurl'
 
 // extends methods array with 'all
