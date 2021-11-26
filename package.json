@@ -20,7 +20,7 @@
     "pretest": "node scripts/testing.mjs main index.js",
     "posttest": "node scripts/testing.mjs main ./lib/express.js",
     "test": "npx nyc --reporter=text mocha --check-leaks",
-    "test-ci": "npm run pretest && npx nyc --reporter=lcov mocha --check-leaks && npx codecov && npm run posttest",
+    "test-ci": "npm run pretest && npx nyc --reporter=lcov --reporter=html --reporter=text mocha --check-leaks && npm run posttest",
     "publish": "npx publish-cli@latest",
     "preReleaseHook": "updatePackageLock build test",
     "prepublishOnly": "npm i && npm run build",
