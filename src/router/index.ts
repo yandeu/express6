@@ -266,6 +266,12 @@ class Router extends ExtensibleFunction<RequestHandler> {
 
     function trim_prefix(layer: Layer, layerError, layerPath, path: string) {
       if (layerPath.length !== 0) {
+        // Validate path is a prefix match
+        if (layerPath !== path.substring(0, layerPath.length)) {
+          next(layerError)
+          return
+        }
+
         // Validate path breaks on a path separator
         const c = path[layerPath.length]
         if (c && c !== '/' && c !== '.') return next(layerError)
