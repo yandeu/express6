@@ -2,7 +2,7 @@
   "name": "express6",
   "version": "0.1.2",
   "description": "🏅 Modern, fast, unopinionated, minimalist web framework.",
-  "main": "./lib/express.js",
+  "main": "index.js",
   "types": "./lib/express.d.ts",
   "type": "commonjs",
   "scripts": {
